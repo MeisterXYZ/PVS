@@ -1,0 +1,32 @@
+listtest2: THEORY 
+BEGIN
+
+
+%----------------------------------------list------
+list [T: TYPE]: DATATYPE
+  BEGIN
+    null: null?
+    cons (car: T, cdr:list):cons?
+  END list
+
+
+l1 : list[int] = cons (2,cons(1,null))
+l2 : list[int] = cons (3, l1)
+
+foo: FORMULA
+     car(l1)=2
+
+bar: FORMULA
+     car(cdr(l1))=1
+baz: FORMULA
+     car(cdr(cdr(l2)))=1
+%bisschen fraglich (muss am namen liegen)
+bak: FORMULA
+     cdr(cdr(l1))=null
+
+
+
+
+
+
+End listtest2

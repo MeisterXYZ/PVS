@@ -1,0 +1,94 @@
+listtest: THEORY 
+BEGIN
+
+
+%----------------------------------------list------
+list [T: TYPE]: DATATYPE
+  BEGIN
+    null: null?
+    cons (car: T, cdr:list):cons?
+  END list
+
+
+l1 : list[int] = cons (2,cons(1,null))
+l2 : list[int] = cons(3,cons(2,cons(1,null)))
+
+foo: FORMULA
+     car(l1)=2
+bar: FORMULA
+     car(cdr(l1))=1
+baz: FORMULA
+     car(cdr(cdr(l2)))=1
+%bisschen fraglich (muss am namen liegen)
+bak: FORMULA
+     cdr(cdr(l1))=null
+
+
+%---------------------------------------goto-------
+
+Counter: TYPE+ = [int] CONTAINING 0
+Storage: TYPE = list[int]
+
+
+expandStorage1:[Storage, int -> Storage] = LAMBDA (s:Storage, i:int):
+ cons(i,expandStorage1(s,i))
+
+
+expandStorage:[Storage, int -> Storage] = LAMBDA (s:Storage, i:int):
+ IF i = 0 THEN
+  IF s=null THEN
+   %this is i+1 storage entries for i entries just return null
+   cons(0, null)
+  ELSE
+   cons(car(s),cdr(s))
+  ENDIF
+ ELSE
+  IF s=null THEN
+   LET ns = expandStorage(s,i-1) IN
+    cons(0, ns)
+  ELSE
+   cons(car(s),expandStorage(cdr(s),i - 1))
+  ENDIF  
+ ENDIF
+
+
+getStorage: [Storage,int -> int] = LAMBDA (s:Storage, i:int):
+ IF i=0 THEN
+  car(s)
+ ELSE
+  getStorage(cdr(s),i-1)
+ ENDIF 
+
+insertStorage: [Storage, int, int -> Storage] = LAMBDA (s:Storage, r:int, i:int):
+ IF r = 0 THEN
+  cons(i,cdr(s))
+ ELSE
+  cons(car(s),insertStorage(cdr(s),r - 1))
+ ENDIF
+ 
+%------TO-DO: Funktion zum neuschreiebn des Storages in benoetigter laenge
+
+Transition: TYPE = [Storage,Counter -> [Storage,Counter]]
+%--------------command-set-----------
+%inc(x)
+inc: [int -> Transition]= LAMBDA (r:int) : 
+ LAMBDA (s:Storage, c:Counter):
+  LET es = expandStorage(s,r) IN
+   LET x = getStorage(es,r) IN
+    LET ns = insertStorage(es,r+1) IN
+     (ns, c+1)
+   %(insertStorage(expandStorage(s,r),r,getStorage(,expandStorage(s,r)r)+1), c+1)
+%dec(x)
+%goto(x)
+%gotoZ(x,y)
+%stop()
+Command: TYPE+ = {inc,dec,goto,gotoZ,stop}
+Commands: TYPE = list[Command]
+
+
+Gp: TYPE = [Counter,Storage,Commands]
+
+
+
+
+End listtest
