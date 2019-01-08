@@ -1,7 +1,7 @@
 listtest: THEORY 
 BEGIN
 
-
+%%%%%------------------------------------------------------MODEL--------------%%%%%%%
 %----------------------------------------list------
 list [T: TYPE]: DATATYPE
   BEGIN
@@ -10,7 +10,7 @@ list [T: TYPE]: DATATYPE
   END list
 
 
-l1 : list[int] = cons (2,cons(1,null))
+l1 : list[int] = cons(2,cons(1,null))
 l2 : list[int] = cons(3,cons(2,cons(1,null)))
 
 foo: FORMULA
@@ -24,16 +24,20 @@ bak: FORMULA
      cdr(cdr(l1))=null
 
 
-%---------------------------------------goto-------
-
+%---------------------------------------counter-------
 Counter: TYPE+ = [int] CONTAINING 0
+
+%---------------------------------------Storage-------
 Storage: TYPE = list[int]
 
+%------------------expand Storage 
+%%expands the Storage to the required size of i items(registers) 
 
+%%test fuer rekursiven Aufruf als Lambda-Notation -> kompiliert nicht
 expandStorage1:[Storage, int -> Storage] = LAMBDA (s:Storage, i:int):
  cons(i,expandStorage1(s,i))
 
-
+%%eigentliche Funktion
 expandStorage:[Storage, int -> Storage] = LAMBDA (s:Storage, i:int):
  IF i = 0 THEN
   IF s=null THEN
@@ -51,7 +55,10 @@ expandStorage:[Storage, int -> Storage] = LAMBDA (s:Storage, i:int):
   ENDIF  
  ENDIF
 
+%% TODO: check if this works by using some FORMULAS
 
+%------------------getStorage
+%%returns Sotrage-List-item (register content) of item(register) i  
 getStorage: [Storage,int -> int] = LAMBDA (s:Storage, i:int):
  IF i=0 THEN
   car(s)
@@ -59,18 +66,26 @@ getStorage: [Storage,int -> int] = LAMBDA (s:Storage, i:int):
   getStorage(cdr(s),i-1)
  ENDIF 
 
+%% TODO: check if this works by using some FORMULAS   
+
+
+%------------------insertStorage
+%%....
 insertStorage: [Storage, int, int -> Storage] = LAMBDA (s:Storage, r:int, i:int):
  IF r = 0 THEN
   cons(i,cdr(s))
  ELSE
   cons(car(s),insertStorage(cdr(s),r - 1))
  ENDIF
- 
-%------TO-DO: Funktion zum neuschreiebn des Storages in benoetigter laenge
 
+%% TODO: check if this works by using some FORMULAS    
+
+
+%-----------------------------------------Command-set-------
+%--------------------command-type
 Transition: TYPE = [Storage,Counter -> [Storage,Counter]]
-%--------------command-set-----------
-%inc(x)
+
+%---------------inc(x)
 inc: [int -> Transition]= LAMBDA (r:int) : 
  LAMBDA (s:Storage, c:Counter):
   LET es = expandStorage(s,r) IN
@@ -78,15 +93,30 @@ inc: [int -> Transition]= LAMBDA (r:int) :
     LET ns = insertStorage(es,r+1) IN
      (ns, c+1)
    %(insertStorage(expandStorage(s,r),r,getStorage(,expandStorage(s,r)r)+1), c+1)
-%dec(x)
-%goto(x)
-%gotoZ(x,y)
-%stop()
+
+%---------------dec(x)
+
+%---------------goto(x)
+
+%---------------gotoZ(x,y)
+
+%---------------stop()
+
+%-------------------Set of the commands
 Command: TYPE+ = {inc,dec,goto,gotoZ,stop}
+%-------------------List of Commands = Code of every Goto-Program
 Commands: TYPE = list[Command]
 
-
+%------------------------------------------GOTO-Program------
 Gp: TYPE = [Counter,Storage,Commands]
+
+
+
+
+
+%%%%%%%%%%%------------------------------------------------------PROOFS------------%%%%%%%%
+
+
 
 
 
