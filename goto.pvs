@@ -5,7 +5,8 @@ BEGIN
 Counter: TYPE+ = [int] CONTAINING 0
 
 %---------------------------------------Storage-------
-Storage: Type = finite_sequence[int]
+Storage: Type = finite_sequence[nat]
+empty_storage:Storage = list2finseq(null)
 
 %------------------expand Storage 
 %%expands the Storage to the required size of i items(registers) 
@@ -21,7 +22,7 @@ nthList(i:nat): RECURSIVE list[nat] =
 
 
 %%expandiert den Storage
-expandStorage:[Storage, int -> Storage] = LAMBDA (s:Storage, (adress:int | adress > length(s))):
+expandStorage:[Storage, nat -> Storage] = LAMBDA (s:Storage, (adress:nat | adress > length(s))):
  o(s,list2finseq(nthList(adress - length(s))))
 
 
@@ -29,7 +30,7 @@ expandStorage:[Storage, int -> Storage] = LAMBDA (s:Storage, (adress:int | adres
 
 %------------------getStorage
 %%returns Sotrage-List-item (register content) of item(register) i  
-getStorage: [Storage,int -> int] = LAMBDA (s:Storage, (adress:int | adress <= length(s))):
+getStorage: [Storage,nat -> nat] = LAMBDA (s:Storage, (adress:nat | adress <= length(s))):
  s`seq(adress)
 
 %% TODO: check if this works by using some FORMULAS   
@@ -67,7 +68,7 @@ setStorage: [Storage, int, int -> Storage] =
 Transition: TYPE = [Storage,Counter -> [Storage,Counter]]
 
 %---------------inc(x)
-inc: [int -> Transition]= LAMBDA (r:int) : 
+inc: [nat -> Transition]= LAMBDA (r:nat) : 
  LAMBDA (s:Storage, c:Counter):
   IF s`length < r THEN
    LET es = expandStorage(s,r) IN
@@ -88,21 +89,37 @@ inc: [int -> Transition]= LAMBDA (r:int) :
 
 %---------------stop()
 
+stop: Transition = LAMBDA (s:Storage, c:Counter):
+  (s,c)
+
 %-------------------Set of the commands
-Command: TYPE+ = {inc,dec,goto,gotoZ,stop}
+Command: TYPE+ = {x : Transition| true} CONTAINING stop
 %-------------------List of Commands = Code of every Goto-Program
 Commands: TYPE = list[Command]
 
 %------------------------------------------GOTO-Program------
-Gp: TYPE = [Counter,Storage,Commands]
+Gp: TYPE = [# counter:Counter, storage:Storage, cmds:Commands #]
 
 
-
+execute(gp:Gp): RECURSIVE Storage = 
+ LET cmd = nth(gp`cmds, gp`counter) IN
+  IF cmd = stop THEN 
+   gp`storage
+  ELSE
+   LET tres = cmd(gp`storage, gp`counter) IN
+    execute((#counter := tres`2, storage:=tres`1, cmds := gp`cmds #))
+  ENDIF
+ MEASURE gp`counter
+ 
+ inc_gp:Gp = (# counter := 0, storage := empty_storage, cmds := cons( inc(1),
+ 	     	     	   	      		     	    cons( inc(1),
+							     cons( stop , null))) #)
 
 
 %%%%%%%%%%%------------------------------------------------------PROOFS------------%%%%%%%%
 
-
+inc_test : FORMULA
+ execute(inc_gp)`seq(1) = 2
 
 
 
