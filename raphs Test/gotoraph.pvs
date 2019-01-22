@@ -1,0 +1,234 @@
+gotoraph: THEORY 
+BEGIN
+
+%---------------------------------------counter-------
+Counter: TYPE+ = [int] CONTAINING 0
+
+%---------------------------------------Storage-------
+Storage: Type = list[nat]
+empty_storage:Storage = null
+
+
+%%%verstehe listenfunktionen
+%%
+l1 : Storage = cons(3,cons(2,cons(1,null)))
+l2 : Storage = cons(6,cons(5,cons(4,null)))
+
+%%cdr(list) - trennt Kopf ab
+cdr1_test1: FORMULA
+  cdr(l1)=cons(2, cons(1, null))
+cdr1_test2: FORMULA
+  cdr(cdr(l1))= cons(1,null)
+
+%%car(list) - liest den Kopf
+car_1_test1: FORMULA
+  car(l1)=3
+
+%Hilfsfunktion Listen
+%concat
+lconcat(l1,l2:list[nat],i:int): RECURSIVE list[nat] = 
+  IF i = 1 THEN %% Endet bei 1, sonst ist car(null) mit enthalten 
+    cons(car(l1),l2)
+  ELSE
+    cons(car(l1),lconcat(cdr(l1),l2,i-1))
+  ENDIF
+ MEASURE i
+%initialer Aufruf
+oo(l1,l2:list[nat]): list[nat] =
+  lconcat(l1,l2,length(l1))
+
+%%OK
+concat_test: FORMULA
+  oo(l1,l2) = cons(3,cons(2,cons(1,cons(6,cons(5,cons(4,null))))))
+  
+
+
+%------------------expand Storage 
+%%expands the Storage to the required size of i items(registers) 
+%% Hilfsfunktion die n lange liste mit 0en erstellt
+nthList(i:nat): RECURSIVE Storage =
+  IF i = 0 THEN
+   null
+  ELSE
+   cons(0,nthList(i - 1))
+  ENDIF
+ MEASURE i
+
+%%%beweis dazu: TODO
+nthList_length: FORMULA
+  (forall(i:nat): nthList(i)`length=i)
+
+
+%%expandiert den Storage
+expandStorage(s:Storage, (adress:nat|adress>length(s))): Storage =
+  oo(s,nthList(adress-length(s)))  
+
+%OK
+expandStorageCheck: FORMULA
+  expandStorage(l1,5)= cons(3,cons(2,cons(1,cons(0,cons(0,null)))))
+
+
+
+%------------------getStorage
+%%returns Sotrage-List-item (register content) of item(register) i  
+getStorage: [Storage,nat -> nat] = LAMBDA (s:Storage, (adress:nat | adress <= length(s))):
+ nth(s,adress)
+
+%% OK   
+get_check: FORMULA
+  getStorage(l1,0)=3
+
+
+
+%------------------setStorage
+
+%% Hilfsfunktion um die Liste zu bearbeiten indem eine neue mit modifizierten Werten erstellt und zurückgegeben wird
+
+%setList: [list[int], int  -> list[int]] = 
+% LAMBDA (list:Storage, pos:int, value:int):  
+setList(list:Storage, pos:nat, value:nat): RECURSIVE list[nat] = 
+  IF pos = 0 THEN
+   cons(value,cdr(list))
+  ELSE
+   cons(car(list),setList(cdr(list),pos - 1,value))
+  ENDIF
+ MEASURE pos
+
+
+
+%% a Storage s, r is the adress
+setStorage: [Storage, int, int -> Storage] = 
+ LAMBDA (s:Storage, (adress :int | adress <= length(s)), (value:int | value >= 0)):
+   setList(s, adress, value)
+   
+%% OK
+setStorage_test: FORMULA
+  setStorage(l1,0,42) = cons(42,cons(2,cons(1,null)))
+setStorage_test2: FORMULA
+  setStorage(l1,2,42) = cons(3,cons(2,cons(42,null)))
+
+
+%% TODO: check if this works by using some FORMULAS    
+
+
+%-----------------------------------------Command-set-------
+%--------------------command-type
+Transition: TYPE = [Storage,Counter -> [Storage,Counter]]
+
+%---------------inc(x)
+inc: [nat -> Transition]= LAMBDA (r:nat) : 
+ LAMBDA (s:Storage, c:Counter):
+  IF length(s) < r THEN
+   LET es = expandStorage(s,r) IN
+    LET x = getStorage(es,r) IN
+     LET ns = setStorage(es,r,x+1) IN
+      (ns, c+1)
+  ELSE
+   LET x = getStorage(s,r) IN
+    LET ns = setStorage(s,r, x+1) IN
+     (ns, c+1)
+  ENDIF
+
+%% OK
+inc_test1: FORMULA
+  inc(1)(l1,0) = (cons(3,cons(3,cons(1,null))),1)
+
+%---------------dec(x)
+
+%---------------goto(x)
+
+%---------------gotoZ(x,y)
+
+%---------------stop()
+stop: Transition = LAMBDA (s:Storage, c:Counter):
+  (s,c)
+
+%-------------------Set of the commands
+Command: TYPE+ = {x : Transition| true} CONTAINING stop
+
+
+Label: TYPE = {INC,DEC,GOTO,GOTOZ,STOP}
+
+%Hilfskonstrukt - überenken
+MarkedCommand: TYPE  = [#label:Label,command:Command#]
+
+%-------------------List of Commands = Code of every Goto-Program
+Commands: TYPE = list[MarkedCommand]
+
+
+%stop-Prädikat
+stop?(l:Label):bool= 
+  IF l = STOP THEN TRUE
+  ELSE FALSE
+  Endif
+
+
+%%geht
+predcheck: FORMULA
+  stop?(INC)= TRUE
+
+
+
+
+
+
+
+%------------------------------------------GOTO-Program------
+Gp: TYPE = [# counter:Counter, storage:Storage, cmds:Commands #]
+
+
+inc_gp:Gp = (# counter := 0, storage := empty_storage, cmds := cons( (#label:=INC,command:=inc(1)#),
+ 	     	     	   	      		     	    cons( (#label:=INC,command:=inc(1)#),
+							     cons( (#label:=STOP,command:=stop#) , null))) #)
+
+
+%%%Tests
+testgp: Gp = (# counter := 0, storage := l1, cmds := cons((#label:=INC,command:=inc(0)#),cons((#label:=STOP,command:=stop#),null)) #)
+
+onestep(gp:Gp): Gp =
+  LET cmd = nth(gp`cmds, gp`counter)`command IN  
+    LET tres = cmd(gp`storage,gp`counter) IN
+      (# counter := tres`2, storage := tres`1, cmds := gp`cmds #)
+
+%% Ein Schritt lässt sich beweisen
+onestep_test1: FORMULA
+  onestep(testgp) = (# counter := 1, storage := cons(4,cons(2,cons(1,null))), cmds := cons((#label:=INC,command:=inc(0)#),cons((#label:=STOP,command:=stop#),null)) #)
+
+
+%%Erst bei STOP stoppen:
+nextstep(gp:Gp): RECURSIVE Gp =
+ LET cmd = nth(gp`cmds, gp`counter) IN
+  IF stop?(cmd`label) THEN
+   (#counter := gp`counter, storage:=gp`storage, cmds := gp`cmds #)
+  ELSE
+   LET step = cmd`command IN
+   LET tres = step(gp`storage, gp`counter) IN
+    nextstep((#counter := tres`2, storage:=tres`1, cmds := gp`cmds #))
+  ENDIF
+ MEASURE gp`counter
+
+
+%% 2 Schritte
+testgp2: Gp = 
+(# counter := 0, 
+   storage := l1, 
+   cmds := cons((#label:=INC,command:=inc(1)#),
+           cons((#label:=INC,command:=inc(0)#),
+           cons((#label:=STOP,command:=stop#),null))) #)
+
+%%Bewiesen
+twostep_test1: FORMULA
+nextstep(testgp2) = 
+(# counter := 2, storage := cons(4,cons(3,cons(1,null))), 
+   cmds := cons((#label:=INC,command:=inc(1)#),
+           cons((#label:=INC,command:=inc(0)#),
+           cons((#label:=STOP,command:=stop#),null))) #)
+
+
+
+%%%%%%%%%%%------------------------------------------------------PROOFS------------%%%%%%%%
+
+
+
+
+End gotoraph

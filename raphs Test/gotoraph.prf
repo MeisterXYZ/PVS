@@ -1,0 +1,351 @@
+(gotoraph
+ (l1_TCC1 0
+  (l1_TCC1-1 nil 3756903977 ("" (subtype-tcc) nil nil) nil nil))
+ (l2_TCC1 0
+  (l2_TCC1-1 nil 3756909034 ("" (subtype-tcc) nil nil) nil nil))
+ (cdr1_test1_TCC1 0
+  (cdr1_test1_TCC1-1 nil 3756903977 ("" (subtype-tcc) nil nil) nil
+   nil))
+ (cdr1_test1 0
+  (cdr1_test1-1 nil 3756903980
+   ("" (expand "l1") (("" (propax) nil nil)) nil)
+   ((l1 const-decl "Storage" gotoraph nil)) shostak))
+ (cdr1_test2_TCC1 0
+  (cdr1_test2_TCC1-1 nil 3756904123 ("" (subtype-tcc) nil nil) nil
+   nil))
+ (cdr1_test2 0
+  (cdr1_test2-1 nil 3756904125
+   ("" (expand "l1") (("" (propax) nil nil)) nil)
+   ((l1 const-decl "Storage" gotoraph nil)) shostak))
+ (car_1_test1 0
+  (car_1_test1-1 nil 3756904216
+   ("" (expand "l1") (("" (propax) nil nil)) nil)
+   ((l1 const-decl "Storage" gotoraph nil)) shostak))
+ (lconcat_TCC1 0
+  (lconcat_TCC1-1 nil 3756909034 ("" (subtype-tcc) nil nil) nil nil))
+ (lconcat_TCC2 0
+  (lconcat_TCC2-1 nil 3756909034 ("" (subtype-tcc) nil nil) nil nil))
+ (lconcat_TCC3 0
+  (lconcat_TCC3-1 nil 3756909034 ("" (subtype-tcc) nil nil) nil nil))
+ (lconcat_TCC4 0
+  (lconcat_TCC4-1 nil 3756909034 ("" (termination-tcc) nil nil) nil
+   nil))
+ (concat_test 0
+  (concat_test-1 nil 3756909042
+   ("" (expand "l1")
+    (("" (expand "l2")
+      (("" (expand "oo")
+        (("" (expand "lconcat")
+          (("" (expand "length")
+            (("" (expand "length")
+              (("" (expand "length")
+                (("" (expand "length")
+                  (("" (expand "lconcat")
+                    (("" (expand "lconcat") (("" (propax) nil nil))
+                      nil))
+                    nil))
+                  nil))
+                nil))
+              nil))
+            nil))
+          nil))
+        nil))
+      nil))
+    nil)
+   ((l2 const-decl "Storage" gotoraph nil)
+    (lconcat def-decl "list[nat]" gotoraph nil)
+    (length def-decl "nat" list_props nil)
+    (oo const-decl "list[nat]" gotoraph nil)
+    (l1 const-decl "Storage" gotoraph nil))
+   shostak))
+ (nthList_TCC1 0
+  (nthList_TCC1-1 nil 3756903977 ("" (subtype-tcc) nil nil) nil nil))
+ (nthList_TCC2 0
+  (nthList_TCC2-1 nil 3756909420 ("" (termination-tcc) nil nil) nil
+   nil))
+ (expandStorage_TCC1 0
+  (expandStorage_TCC1-1 nil 3756903977 ("" (subtype-tcc) nil nil) nil
+   nil))
+ (expandStorageCheck_TCC1 0
+  (expandStorageCheck_TCC1-1 nil 3756909763 ("" (subtype-tcc) nil nil)
+   nil nil))
+ (expandStorageCheck 0
+  (expandStorageCheck-1 nil 3756909764
+   ("" (expand "l1")
+    (("" (expand "expandStorage")
+      (("" (expand "length")
+        (("" (expand "length")
+          (("" (expand "length")
+            (("" (expand "length")
+              (("" (expand "nthList")
+                (("" (expand "nthList")
+                  (("" (expand "nthList")
+                    (("" (expand "oo")
+                      (("" (expand "lconcat")
+                        (("" (expand "length")
+                          (("" (expand "length")
+                            (("" (expand "length")
+                              ((""
+                                (expand "length")
+                                ((""
+                                  (expand "lconcat")
+                                  ((""
+                                    (expand "lconcat")
+                                    (("" (propax) nil nil))
+                                    nil))
+                                  nil))
+                                nil))
+                              nil))
+                            nil))
+                          nil))
+                        nil))
+                      nil))
+                    nil))
+                  nil))
+                nil))
+              nil))
+            nil))
+          nil))
+        nil))
+      nil))
+    nil)
+   ((expandStorage const-decl "Storage" gotoraph nil)
+    (oo const-decl "list[nat]" gotoraph nil)
+    (lconcat def-decl "list[nat]" gotoraph nil)
+    (nthList def-decl "Storage" gotoraph nil)
+    (length def-decl "nat" list_props nil)
+    (l1 const-decl "Storage" gotoraph nil))
+   shostak))
+ (getStorage_TCC1 0
+  (getStorage_TCC1-1 nil 3756903977 ("" (subtype-tcc) nil nil) nil
+   nil))
+ (getStorage_TCC2 0
+  (getStorage_TCC2-1 nil 3756903977 ("" (subtype-tcc) nil nil) nil
+   nil))
+ (get_check 0
+  (get_check-1 nil 3756905210
+   ("" (expand "l1")
+    (("" (expand "getStorage")
+      (("" (expand "nth") (("" (propax) nil nil)) nil)) nil))
+    nil)
+   ((getStorage const-decl "[Storage, nat -> nat]" gotoraph nil)
+    (nth def-decl "T" list_props nil)
+    (l1 const-decl "Storage" gotoraph nil))
+   shostak))
+ (setList_TCC1 0
+  (setList_TCC1-1 nil 3756903977 ("" (subtype-tcc) nil nil) nil nil))
+ (setList_TCC2 0
+  (setList_TCC2-1 nil 3756903977 ("" (subtype-tcc) nil nil) nil nil))
+ (setStorage_TCC1 0
+  (setStorage_TCC1-1 nil 3756903977 ("" (subtype-tcc) nil nil) nil
+   nil))
+ (setStorage_TCC2 0
+  (setStorage_TCC2-1 nil 3756903977 ("" (subtype-tcc) nil nil) nil
+   nil))
+ (setStorage_test 0
+  (setStorage_test-1 nil 3756910330
+   ("" (expand "l1")
+    (("" (expand "setStorage")
+      (("" (expand "setList") (("" (propax) nil nil)) nil)) nil))
+    nil)
+   ((setStorage const-decl "[Storage, int, int -> Storage]" gotoraph
+     nil)
+    (setList def-decl "list[nat]" gotoraph nil)
+    (l1 const-decl "Storage" gotoraph nil))
+   shostak))
+ (setStorage_test2 0
+  (setStorage_test2-1 nil 3756910465
+   ("" (expand "l1")
+    (("" (expand "setStorage")
+      (("" (expand "setList")
+        (("" (expand "setList")
+          (("" (expand "setList") (("" (propax) nil nil)) nil)) nil))
+        nil))
+      nil))
+    nil)
+   ((setStorage const-decl "[Storage, int, int -> Storage]" gotoraph
+     nil)
+    (setList def-decl "list[nat]" gotoraph nil)
+    (l1 const-decl "Storage" gotoraph nil))
+   shostak))
+ (inc_TCC1 0
+  (inc_TCC1-1 nil 3756909034 ("" (subtype-tcc) nil nil) nil nil))
+ (inc_test1 0
+  (inc_test1-1 nil 3756910908
+   ("" (expand "l1")
+    (("" (expand "inc")
+      (("" (expand "list2finseq")
+        (("" (expand "length")
+          (("" (expand "length")
+            (("" (expand "length")
+              (("" (expand "length")
+                (("" (expand "getStorage")
+                  (("" (expand "nth")
+                    (("" (expand "nth")
+                      (("" (expand "setStorage")
+                        (("" (expand "setList")
+                          (("" (expand "setList")
+                            (("" (propax) nil nil)) nil))
+                          nil))
+                        nil))
+                      nil))
+                    nil))
+                  nil))
+                nil))
+              nil))
+            nil))
+          nil))
+        nil))
+      nil))
+    nil)
+   ((inc const-decl "[nat -> Transition]" gotoraph nil)
+    (length def-decl "nat" list_props nil)
+    (getStorage const-decl "[Storage, nat -> nat]" gotoraph nil)
+    (setList def-decl "list[nat]" gotoraph nil)
+    (setStorage const-decl "[Storage, int, int -> Storage]" gotoraph
+     nil)
+    (nth def-decl "T" list_props nil)
+    (list2finseq const-decl "finseq[T]" list2finseq nil)
+    (l1 const-decl "Storage" gotoraph nil))
+   shostak))
+ (predcheck 0
+  (predcheck-1 nil 3756913430
+   ("" (expand "stop?") (("" (postpone) nil nil)) nil)
+   ((stop const-decl "Transition" gotoraph nil)
+    (stop? const-decl "bool" gotoraph nil))
+   shostak))
+ (onestep_TCC1 0
+  (onestep_TCC1-1 nil 3756914706 ("" (subtype-tcc) nil nil) nil nil))
+ (onestep_test1 0
+  (onestep_test1-1 nil 3756912067
+   ("" (expand "testgp")
+    (("" (expand "l1")
+      (("" (expand "onestep")
+        (("" (expand "nth")
+          (("" (expand "inc")
+            (("" (expand "length")
+              (("" (expand "length")
+                (("" (expand "length")
+                  (("" (expand "length")
+                    (("" (expand "getStorage")
+                      (("" (expand "nth")
+                        (("" (expand "setStorage")
+                          (("" (expand "setList")
+                            (("" (propax) nil nil)) nil))
+                          nil))
+                        nil))
+                      nil))
+                    nil))
+                  nil))
+                nil))
+              nil))
+            nil))
+          nil))
+        nil))
+      nil))
+    nil)
+   ((l1 const-decl "Storage" gotoraph nil)
+    (nth def-decl "T" list_props nil)
+    (length def-decl "nat" list_props nil)
+    (getStorage const-decl "[Storage, nat -> nat]" gotoraph nil)
+    (setStorage const-decl "[Storage, int, int -> Storage]" gotoraph
+     nil)
+    (setList def-decl "list[nat]" gotoraph nil)
+    (inc const-decl "[nat -> Transition]" gotoraph nil)
+    (onestep const-decl "Gp" gotoraph nil)
+    (testgp const-decl "Gp" gotoraph nil))
+   shostak))
+ (nextstep_TCC1 0
+  (nextstep_TCC1-1 nil 3756915331 ("" (subtype-tcc) nil nil) nil nil))
+ (nextstep_TCC2 0
+  (nextstep_TCC2-1 nil 3756915331 ("" (termination-tcc) nil nil) nil
+   nil))
+ (nextstep_TCC3 0
+  (nextstep_TCC3-1 nil 3756915831 ("" (subtype-tcc) nil nil) nil nil))
+ (twostep_test1 0
+  (twostep_test1-1 nil 3756915335
+   ("" (expand "testgp2")
+    (("" (expand "l1")
+      (("" (expand "nextstep")
+        (("" (expand "nth")
+          (("" (expand "stop?")
+            (("" (expand "inc")
+              (("" (expand "length")
+                (("" (expand "length")
+                  (("" (expand "length")
+                    (("" (expand "length")
+                      (("" (expand "getStorage")
+                        (("" (expand "nth")
+                          (("" (expand "nth")
+                            (("" (expand "setStorage")
+                              ((""
+                                (expand "setList")
+                                ((""
+                                  (expand "setList")
+                                  ((""
+                                    (expand "nextstep")
+                                    ((""
+                                      (expand "nth")
+                                      ((""
+                                        (expand "nth")
+                                        ((""
+                                          (expand "stop?")
+                                          ((""
+                                            (expand "length")
+                                            ((""
+                                              (expand "length")
+                                              ((""
+                                                (expand "nextstep")
+                                                ((""
+                                                  (expand "nth")
+                                                  ((""
+                                                    (expand "nth")
+                                                    ((""
+                                                      (expand "nth")
+                                                      ((""
+                                                        (expand
+                                                         "stop?")
+                                                        ((""
+                                                          (propax)
+                                                          nil
+                                                          nil))
+                                                        nil))
+                                                      nil))
+                                                    nil))
+                                                  nil))
+                                                nil))
+                                              nil))
+                                            nil))
+                                          nil))
+                                        nil))
+                                      nil))
+                                    nil))
+                                  nil))
+                                nil))
+                              nil))
+                            nil))
+                          nil))
+                        nil))
+                      nil))
+                    nil))
+                  nil))
+                nil))
+              nil))
+            nil))
+          nil))
+        nil))
+      nil))
+    nil)
+   ((l1 const-decl "Storage" gotoraph nil)
+    (nth def-decl "T" list_props nil)
+    (inc const-decl "[nat -> Transition]" gotoraph nil)
+    (setStorage const-decl "[Storage, int, int -> Storage]" gotoraph
+     nil)
+    (setList def-decl "list[nat]" gotoraph nil)
+    (getStorage const-decl "[Storage, nat -> nat]" gotoraph nil)
+    (length def-decl "nat" list_props nil)
+    (stop? const-decl "bool" gotoraph nil)
+    (nextstep def-decl "Gp" gotoraph nil)
+    (testgp2 const-decl "Gp" gotoraph nil))
+   shostak)))
+
