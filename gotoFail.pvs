@@ -1,0 +1,134 @@
+goto: THEORY
+BEGIN
+
+%---------------------------------------counter-------
+Counter: TYPE+ = [int] CONTAINING 0
+
+%---------------------------------------Storage-------
+Storage: Type = finite_sequence[nat]
+empty_storage:Storage = list2finseq(null)
+
+%------------------expand Storage
+%%expands the Storage to the required size of i items(registers)
+
+
+nthList(i:nat): RECURSIVE list[nat] =
+  IF i = 0 THEN
+   null
+  ELSE
+   cons(0,nthList(i - 1))
+  ENDIF
+ MEASURE i
+
+
+%%expandiert den Storage
+expandStorage:[Storage, nat -> Storage] = LAMBDA (s:Storage, (adress:nat | adress > length(s))):
+ o(s,list2finseq(nthList(adress - length(s))))
+
+
+%% TODO: check if this works by using some FORMULAS
+
+%------------------getStorage
+%%returns Sotrage-List-item (register content) of item(register) i
+getStorage: [Storage,nat -> nat] = LAMBDA (s:Storage, (adress:nat | adress <= length(s))):
+ s`seq(adress)
+
+%% TODO: check if this works by using some FORMULAS
+
+
+%------------------setStorage
+
+%% Hilfsfunktion um die Liste zu bearbeiten indem eine neue mit modifizierten Werten erstellt und zurückgegeben wird
+
+%setList: [list[int], int  -> list[int]] =
+% LAMBDA (list:Storage, pos:int, value:int):
+setList(list:Storage, pos:nat, value:nat): RECURSIVE list[nat] =
+  IF pos = 0 THEN
+   cons(value,cdr(list))
+  ELSE
+   cons(car(list),setList(cdr(list),pos - 1,value))
+  ENDIF
+ MEASURE pos
+
+
+
+%% a Storage s, r is the adress
+setStorage: [Storage, int, int -> Storage] =
+ LAMBDA (s:Storage, (adress :int | adress <= length(s)), (value:int | value >= 0)):
+  LET list = finseq2list(s) IN
+   list2finseq(setList(list, adress, value))
+
+
+
+%% TODO: check if this works by using some FORMULAS
+
+
+%-----------------------------------------Command-set-------
+%--------------------command-type
+Configuration: TYPE = [# storage:Storage, counter:Counter #]
+Transition: TYPE = [Configuration -> Configuration]
+
+%---------------inc(x)
+inc: [nat -> Transition]= LAMBDA (r:nat) :
+ LAMBDA (cf:Configuration):
+ LET s = cf`storage IN
+  IF s`length < r THEN
+   LET es = expandStorage(s,r) IN
+    LET x = getStorage(es,r) IN
+     LET ns = setStorage(es,r,x+1) IN
+      (# storage:= ns, counter := cf`counter+1#)
+  ELSE
+   LET x = getStorage(s,r) IN
+    LET ns = setStorage(s,r, x+1) IN
+     (# storage := ns, counter := cf`counter+1 #)
+  ENDIF
+
+%---------------dec(x)
+
+%---------------goto(x)
+
+%---------------gotoZ(x,y)
+
+%---------------stop()
+
+stop: Transition = id[Configuration]
+
+%-------------------Set of the commands
+Command: TYPE+ = {x : Transition| true} CONTAINING stop
+%-------------------List of Commands = Code of every Goto-Program
+Commands: TYPE = list[Command]
+
+%------------------------------------------GOTO-Program------
+Gp: TYPE = [# config:Configuration , cmds:Commands #]
+
+
+step:[Gp -> Configuration] = LAMBDA (gp:Gp):
+ LET cmd = nth(gp`cmds, gp`config`counter) IN
+  cmd(gp`config)
+
+terminates(gp:GP)
+
+execute(gp:Gp): RECURSIVE Storage =
+ LET cmd = nth(gp`cmds, gp`config`counter) IN
+  IF cmd = stop THEN
+   gp`config`storage
+  ELSE
+   LET tres = cmd(gp`config) IN
+    %execute((#config := tres, cmds := gp`cmds #))
+  ENDIF
+ MEASURE gp``counter
+
+ inc_gp:Gp = (# counter := 0, storage := empty_storage, cmds := cons( inc(1),
+ 	     	     	   	      		     	    cons( inc(1),
+							     cons( stop , null))) #)
+
+
+%%%%%%%%%%%------------------------------------------------------PROOFS------------%%%%%%%%
+
+inc_test : FORMULA
+ execute(inc_gp)`seq(1) = 2
+
+
+
+
+End goto
