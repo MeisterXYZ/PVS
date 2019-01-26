@@ -1,4 +1,4 @@
-goto: THEORY
+gotoF: THEORY
 BEGIN
 
 %---------------------------------------counter-------
@@ -102,11 +102,11 @@ Commands: TYPE = list[Command]
 Gp: TYPE = [# config:Configuration , cmds:Commands #]
 
 
-step:[Gp -> Configuration] = LAMBDA (gp:Gp):
- LET cmd = nth(gp`cmds, gp`config`counter) IN
-  cmd(gp`config)
+%step:[Gp -> Configuration] = LAMBDA (gp:Gp):
+% LET cmd = nth(gp`cmds, gp`config`counter) IN
+%  cmd(gp`config)
 
-terminates(gp:GP)
+%terminates()
 
 execute(gp:Gp): RECURSIVE Storage =
  LET cmd = nth(gp`cmds, gp`config`counter) IN
@@ -114,21 +114,24 @@ execute(gp:Gp): RECURSIVE Storage =
    gp`config`storage
   ELSE
    LET tres = cmd(gp`config) IN
-    %execute((#config := tres, cmds := gp`cmds #))
+    execute((#config := tres, cmds := gp`cmds #))
   ENDIF
- MEASURE gp``counter
+ MEASURE gp`config`counter
 
- inc_gp:Gp = (# counter := 0, storage := empty_storage, cmds := cons( inc(1),
- 	     	     	   	      		     	    cons( inc(1),
-							     cons( stop , null))) #)
+ inc_gp:Gp = (#
+  config:= (#
+   counter := 0,
+   storage := empty_storage
+  #),
+  cmds := cons( inc(1), cons( stop , null)) #)
 
 
 %%%%%%%%%%%------------------------------------------------------PROOFS------------%%%%%%%%
 
 inc_test : FORMULA
- execute(inc_gp)`seq(1) = 2
+ execute(inc_gp)`seq(1) = 1
 
 
 
 
-End goto
+End gotoF
