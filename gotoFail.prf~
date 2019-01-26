@@ -237,26 +237,47 @@
       (("" (expand "nth")
         (("" (expand "inc")
           (("" (expand "empty_storage")
-            (("" (expand "list2finseq")
-              (("" (expand "length")
-                (("" (expand "stop?")
-                  (("" (expand "execute")
+            (("" (expand "length")
+              (("" (expand "stop?")
+                (("" (expand "execute")
+                  (("" (expand "nth")
                     (("" (expand "nth")
-                      (("" (expand "nth")
-                        (("" (expand "stop")
-                          (("" (expand "id")
-                            (("" (expand "stop?")
+                      (("" (expand "stop")
+                        (("" (expand "id")
+                          (("" (expand "stop?")
+                            (("" (expand "expandStorage")
                               ((""
-                                (expand "expandStorage")
+                                (expand "length")
                                 ((""
-                                  (expand "length")
+                                  (expand "nthList")
                                   ((""
                                     (expand "nthList")
                                     ((""
                                       (expand "nthList")
                                       ((""
                                         (expand "append")
-                                        (("" (postpone) nil nil))
+                                        ((""
+                                          (expand "getStorage")
+                                          ((""
+                                            (expand "nth")
+                                            ((""
+                                              (expand "nth")
+                                              ((""
+                                                (expand "setStorage")
+                                                ((""
+                                                  (expand "setList")
+                                                  ((""
+                                                    (expand "setList")
+                                                    ((""
+                                                      (propax)
+                                                      nil
+                                                      nil))
+                                                    nil))
+                                                  nil))
+                                                nil))
+                                              nil))
+                                            nil))
+                                          nil))
                                         nil))
                                       nil))
                                     nil))
@@ -276,5 +297,136 @@
         nil))
       nil))
     nil)
-   nil shostak)))
+   ((execute def-decl "Storage" gotoF nil)
+    (inc const-decl "[nat -> Transition]" gotoF nil)
+    (length def-decl "nat" list_props nil)
+    (id const-decl "(bijective?[T, T])" identity nil)
+    (expandStorage const-decl "[Storage, nat -> Storage]" gotoF nil)
+    (nthList def-decl "list[nat]" gotoF nil)
+    (getStorage const-decl "[Storage, nat -> nat]" gotoF nil)
+    (setList def-decl "list[nat]" gotoF nil)
+    (setStorage const-decl "[Storage, int, int -> Storage]" gotoF nil)
+    (append def-decl "list[T]" list_props nil)
+    (stop const-decl "Transition" gotoF nil)
+    (stop? const-decl "bool" gotoF nil)
+    (empty_storage const-decl "Storage" gotoF nil)
+    (nth def-decl "T" list_props nil)
+    (inc_gp const-decl "Gp" gotoF nil))
+   shostak))
+ (inc_all_TCC1 0
+  (inc_all_TCC1-1 nil 3757504441 ("" (subtype-tcc) nil nil) nil nil))
+ (inc_all_TCC2 0
+  (inc_all_TCC2-1 nil 3757504441 ("" (subtype-tcc) nil nil) nil nil))
+ (dec_gp1_TCC1 0
+  (dec_gp1_TCC1-1 nil 3757502028 ("" (subtype-tcc) nil nil) nil nil))
+ (dec_gp1_TCC2 0
+  (dec_gp1_TCC2-1 nil 3757502253 ("" (subtype-tcc) nil nil) nil nil))
+ (dec_test1_TCC1 0
+  (dec_test1_TCC1-1 nil 3757502028 ("" (subtype-tcc) nil nil) nil nil))
+ (dec_test1 0
+  (dec_test1-1 nil 3757502029
+   ("" (expand "dec_gp1")
+    (("" (expand "execute")
+      (("" (expand "nth")
+        (("" (expand "dec")
+          (("" (expand "length")
+            (("" (expand "length")
+              (("" (expand "stop?")
+                (("" (expand "execute")
+                  (("" (expand "nth")
+                    (("" (expand "nth")
+                      (("" (expand "stop")
+                        (("" (expand "stop?")
+                          (("" (expand "id")
+                            (("" (expand "expandStorage")
+                              ((""
+                                (expand "length")
+                                ((""
+                                  (expand "max")
+                                  ((""
+                                    (expand "getStorage")
+                                    ((""
+                                      (expand "nth")
+                                      ((""
+                                        (expand "nth")
+                                        ((""
+                                          (expand "setStorage")
+                                          ((""
+                                            (expand "setList")
+                                            ((""
+                                              (expand "setList")
+                                              (("" (propax) nil nil))
+                                              nil))
+                                            nil))
+                                          nil))
+                                        nil))
+                                      nil))
+                                    nil))
+                                  nil))
+                                nil))
+                              nil))
+                            nil))
+                          nil))
+                        nil))
+                      nil))
+                    nil))
+                  nil))
+                nil))
+              nil))
+            nil))
+          nil))
+        nil))
+      nil))
+    nil)
+   ((execute def-decl "Storage" gotoF nil)
+    (dec const-decl "[nat -> Transition]" gotoF nil)
+    (expandStorage const-decl "[Storage, nat -> Storage]" gotoF nil)
+    (max const-decl "{p: real | p >= m AND p >= n}" real_defs nil)
+    (setStorage const-decl "[Storage, int, int -> Storage]" gotoF nil)
+    (setList def-decl "list[nat]" gotoF nil)
+    (getStorage const-decl "[Storage, nat -> nat]" gotoF nil)
+    (id const-decl "(bijective?[T, T])" identity nil)
+    (stop const-decl "Transition" gotoF nil)
+    (stop? const-decl "bool" gotoF nil)
+    (length def-decl "nat" list_props nil)
+    (nth def-decl "T" list_props nil)
+    (dec_gp1 const-decl "Gp" gotoF nil))
+   shostak))
+ (dec_test2_TCC1 0
+  (dec_test2_TCC1-1 nil 3757504441 ("" (subtype-tcc) nil nil) nil nil))
+ (dec_test2 0
+  (dec_test2-1 nil 3757504449
+   ("" (expand "dec_gp2")
+    (("" (expand "execute") (("" (grind) nil nil)) nil)) nil)
+   ((execute def-decl "Storage" gotoF nil)
+    (empty_storage const-decl "Storage" gotoF nil)
+    (stop const-decl "Transition" gotoF nil)
+    (nth def-decl "T" list_props nil)
+    (length def-decl "nat" list_props nil)
+    (nthList def-decl "list[nat]" gotoF nil)
+    (append def-decl "list[T]" list_props nil)
+    (expandStorage const-decl "[Storage, nat -> Storage]" gotoF nil)
+    (getStorage const-decl "[Storage, nat -> nat]" gotoF nil)
+    (max const-decl "{p: real | p >= m AND p >= n}" real_defs nil)
+    (setList def-decl "list[nat]" gotoF nil)
+    (setStorage const-decl "[Storage, int, int -> Storage]" gotoF nil)
+    (dec const-decl "[nat -> Transition]" gotoF nil)
+    (stop? const-decl "bool" gotoF nil)
+    (id const-decl "(bijective?[T, T])" identity nil)
+    (real_lt_is_strict_total_order name-judgement
+     "(strict_total_order?[real])" real_props nil)
+    (rat_max application-judgement "{s: rat | s >= q AND s >= r}"
+     real_defs nil)
+    (int_max application-judgement "{k: int | i <= k AND j <= k}"
+     real_defs nil)
+    (int_plus_int_is_int application-judgement "int" integers nil)
+    (int_minus_int_is_int application-judgement "int" integers nil)
+    (real_le_is_total_order name-judgement "(total_order?[real])"
+     real_props nil)
+    (dec_gp2 const-decl "Gp" gotoF nil))
+   shostak))
+ (add_gp_TCC1 0
+  (add_gp_TCC1-1 nil 3757504441 ("" (subtype-tcc) nil nil) nil nil))
+ (add_gp_TCC2 0
+  (add_gp_TCC2-1 nil 3757504441 ("" (subtype-tcc) nil nil) nil nil)))
 

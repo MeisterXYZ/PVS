@@ -100,10 +100,39 @@ inc: [nat -> Transition]= LAMBDA (r:nat) :
   ENDIF
 
 %---------------dec(x)
+dec: [nat -> Transition]= LAMBDA (r:nat) :
+ LAMBDA (cf:Configuration):
+ LET s = cf`storage IN
+  IF length(s) <= r THEN
+   LET es = expandStorage(s,r) IN
+    LET x = getStorage(es,r) IN
+     LET ns = setStorage(es,r,max(x-1,0)) IN
+      (# storage:= ns, counter := cf`counter+1#)
+  ELSE
+   LET x = getStorage(s,r) IN
+    LET ns = setStorage(s,r, max(x-1,0)) IN
+     (# storage := ns, counter := cf`counter+1 #)
+  ENDIF
 
 %---------------goto(x)
+goto: [nat -> Transition]= LAMBDA (adress:nat):
+ LAMBDA(cf:Configuration):
+  (# storage := cf`storage, counter:= adress#)
 
 %---------------gotoZ(x,y)
+gotoZ: [nat,nat -> Transition]= LAMBDA (reg:nat, adress:nat):
+ LAMBDA(cf:Configuration):
+  LET s = cf`storage IN
+  IF length(s) <= reg THEN
+    (# storage:= cf`storage, counter := cf`counter+1#)
+  ELSE
+   LET x = getStorage(s,reg) IN
+    IF x = 0 THEN
+     (# storage := cf`storage, counter := adress #)
+    ELSE
+     (# storage:= cf`storage, counter := cf`counter+1#)
+    ENDIF
+  ENDIF
 
 %---------------stop()
 
@@ -140,6 +169,7 @@ execute(gp:Gp): RECURSIVE Storage =
    ENDIF
  MEASURE gp`config`counter
 
+%%% ------- INC ------- %%%
  inc_gp:Gp = (#
   config:= (#
    counter := 0,
@@ -147,13 +177,53 @@ execute(gp:Gp): RECURSIVE Storage =
   #),
   cmds := cons( inc(1), cons( stop , null)) #)
 
-
-%%%%%%%%%%%------------------------------------------------------PROOFS------------%%%%%%%%
-
+%proofed
 inc_test : FORMULA
  nth(execute(inc_gp),1) = 1
 
+%bringt wahrscheinlich so nichts
+inc_all: FORMULA
+ FORALL(i:nat, s:Storage):nth( execute((#
+  config:= (#
+   counter := 0,
+   storage := s
+  #),
+  cmds := cons( inc(i), cons( stop , null)) #)),i) = 1
+
+%%% ------- DEC ------- %%%
+
+ dec_gp1:Gp = (#
+  config:= (#
+   counter := 0,
+   storage := cons(0, cons(2, null))
+  #),
+  cmds := cons( dec(1), cons( stop , null)) #)
+
+dec_test1: FORMULA
+ nth(execute(dec_gp1),1) = 1
+
+ dec_gp2:Gp = (#
+  config:= (#
+   counter := 0,
+   storage := empty_storage
+  #),
+  cmds := cons( dec(1), cons( stop , null)) #)
+
+dec_test2: FORMULA
+ nth(execute(dec_gp2), 1) = 0
 
 
+
+%%% ------ ADD ------ %%%
+add_gp: Gp = (#
+  config:= (#
+   counter := 0,
+   storage := cons(0 ,cons(2,cons(3,null)))
+  #),
+  cmds := cons( inc(0), cons( dec(1) , cons( gotoZ(1,4), cons(goto(0), cons(inc(0), cons( dec(2), cons(gotoZ(2,8), cons(goto(4), cons(stop, null)))))))))#)
+
+
+add_test:FORMULA
+ nth(execute(add_gp),0) = 5 
 
 End gotoF
