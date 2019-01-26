@@ -425,8 +425,28 @@
      real_props nil)
     (dec_gp2 const-decl "Gp" gotoF nil))
    shostak))
+ (add_cmd_TCC1 0
+  (add_cmd_TCC1-1 nil 3757505583 ("" (subtype-tcc) nil nil) nil nil))
  (add_gp_TCC1 0
   (add_gp_TCC1-1 nil 3757504441 ("" (subtype-tcc) nil nil) nil nil))
- (add_gp_TCC2 0
-  (add_gp_TCC2-1 nil 3757504441 ("" (subtype-tcc) nil nil) nil nil)))
+ (add_gen_TCC1 0
+  (add_gen_TCC1-1 nil 3757504952 ("" (subtype-tcc) nil nil) nil nil))
+ (add_gen 0
+  (add_gen-1 nil 3757504953
+   ("" (induct i :name "NAT_induction")
+    (("1" (skolem!)
+      (("1" (flatten)
+        (("1" (skolem!)
+          (("1" (inst - "j!1")
+            (("1" (split)
+              (("1" (inst - "j!2") nil nil)
+               ("2" (grind) (("2" (postpone) nil nil)) nil))
+              nil))
+            nil))
+          nil))
+        nil))
+      nil)
+     ("2" (postpone) nil nil))
+    nil)
+   nil shostak)))
 

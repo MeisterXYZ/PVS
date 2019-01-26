@@ -215,15 +215,25 @@ dec_test2: FORMULA
 
 
 %%% ------ ADD ------ %%%
+
+%add_cmd:Commands = cons(gotoZ(1, 4), cons(inc(0), cons(dec(1), cons(goto(0), cons(gotoZ(2,8), cons(inc(0), cons(dec(2), cons(goto(4), cons (stop, null)))))))))
+
+add_cmd:Commands = cons(gotoZ(1,4), cons(inc(0), cons(dec(0), cons(goto(0), cons(stop, null)))))
+
 add_gp: Gp = (#
   config:= (#
    counter := 0,
    storage := cons(0 ,cons(2,cons(3,null)))
   #),
-  cmds := cons( inc(0), cons( dec(1) , cons( gotoZ(1,4), cons(goto(0), cons(inc(0), cons( dec(2), cons(gotoZ(2,8), cons(goto(4), cons(stop, null)))))))))#)
+  cmds := add_cmd#)
 
 
-add_test:FORMULA
- nth(execute(add_gp),0) = 5 
+add_gen:FORMULA
+ FORALL(i:nat,j:nat):nth( execute((#
+  config:= (#
+   counter := 0,
+   storage := cons(i ,cons(j,null))
+  #),
+   cmds := add_cmd #)),0) = i + j
 
 End gotoF
