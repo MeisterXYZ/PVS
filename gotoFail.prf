@@ -1,34 +1,43 @@
 (gotoF
  (nthList_TCC1 0
-  (nthList_TCC1-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil nil))
+  (nthList_TCC1-1 nil 3757492677 ("" (subtype-tcc) nil nil)
+   ((boolean nonempty-type-decl nil booleans nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (number nonempty-type-decl nil numbers nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (>= const-decl "bool" reals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (nat nonempty-type-eq-decl nil naturalnumbers nil)
+    (int_minus_int_is_int application-judgement "int" integers nil)
+    (real_ge_is_total_order name-judgement "(total_order?[real])"
+     real_props nil))
+   nil))
  (nthList_TCC2 0
-  (nthList_TCC2-1 nil 3757142689 ("" (termination-tcc) nil nil) nil
+  (nthList_TCC2-1 nil 3757492677 ("" (termination-tcc) nil nil) nil
    nil))
  (nthList_length 0
-  (nthList_length-1 nil 3757484161
+  (nthList_length-1 nil 3757492679
    ("" (induct i)
-    (("1" (expand "list2finseq")
-      (("1" (expand "nthList")
-        (("1" (expand "length") (("1" (propax) nil nil)) nil)) nil))
-      nil)
-     ("2" (skolem!)
-      (("2" (flatten)
-        (("2" (expand nthList +)
-          (("2" (expand "list2finseq") (("2" (grind) nil nil)) nil))
-          nil))
-        nil))
-      nil))
+    (("1" (expand "nthList")
+      (("1" (expand "length") (("1" (propax) nil nil)) nil)) nil)
+     ("2" (skosimp)
+      (("2" (expand "nthList" +) (("2" (grind) nil nil)) nil)) nil))
     nil)
    ((posint_plus_nnint_is_posint application-judgement "posint"
      integers nil)
     (nnint_plus_posint_is_posint application-judgement "posint"
      integers nil)
-    (length def-decl "nat" list_props nil)
     (nat_induction formula-decl nil naturalnumbers nil)
     (nthList def-decl "list[nat]" gotoF nil)
-    (list2finseq const-decl "finseq[T]" list2finseq nil)
-    (finseq type-eq-decl nil finite_sequences nil)
-    (below type-eq-decl nil nat_types nil)
+    (length def-decl "nat" list_props nil)
     (AND const-decl "[bool, bool -> bool]" booleans nil)
     (PRED type-eq-decl nil defined_types nil)
     (list type-decl nil list_adt nil)
@@ -50,56 +59,234 @@
     (number nonempty-type-decl nil numbers nil))
    shostak))
  (expandStorage_TCC1 0
-  (expandStorage_TCC1-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil
+  (expandStorage_TCC1-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil
    nil))
  (expandStorage_TCC2 0
-  (expandStorage_TCC2-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil
+  (expandStorage_TCC2-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil
    nil))
+ (append_id 0
+  (append_id-1 nil 3757494452
+   ("" (induct s) (("1" (grind) nil nil) ("2" (grind) nil nil)) nil)
+   ((NOT const-decl "[bool -> bool]" booleans nil)
+    (list_induction formula-decl nil list_adt nil)
+    (number nonempty-type-decl nil numbers nil)
+    (boolean nonempty-type-decl nil booleans nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (>= const-decl "bool" reals nil)
+    (nat nonempty-type-eq-decl nil naturalnumbers nil)
+    (null adt-constructor-decl "(null?)" list_adt nil)
+    (null? adt-recognizer-decl "[list -> boolean]" list_adt nil)
+    (append def-decl "list[T]" list_props nil)
+    (= const-decl "[T, T -> boolean]" equalities nil)
+    (Storage nonempty-type-eq-decl nil gotoF nil)
+    (AND const-decl "[bool, bool -> bool]" booleans nil)
+    (PRED type-eq-decl nil defined_types nil)
+    (list type-decl nil list_adt nil))
+   shostak))
+ (append_length 0
+  (append_length-1 nil 3757493940
+   ("" (induct s1)
+    (("1" (induct s2)
+      (("1" (expand "append")
+        (("1" (expand "length") (("1" (propax) nil nil)) nil)) nil)
+       ("2" (grind) nil nil))
+      nil)
+     ("2" (grind) nil nil))
+    nil)
+   ((posint_plus_nnint_is_posint application-judgement "posint"
+     integers nil)
+    (NOT const-decl "[bool -> bool]" booleans nil)
+    (null? adt-recognizer-decl "[list -> boolean]" list_adt nil)
+    (null adt-constructor-decl "(null?)" list_adt nil)
+    (list_induction formula-decl nil list_adt nil)
+    (number nonempty-type-decl nil numbers nil)
+    (boolean nonempty-type-decl nil booleans nil)
+    (number_field_pred const-decl "[number -> boolean]" number_fields
+     nil)
+    (number_field nonempty-type-from-decl nil number_fields nil)
+    (real_pred const-decl "[number_field -> boolean]" reals nil)
+    (real nonempty-type-from-decl nil reals nil)
+    (rational_pred const-decl "[real -> boolean]" rationals nil)
+    (rational nonempty-type-from-decl nil rationals nil)
+    (integer_pred const-decl "[rational -> boolean]" integers nil)
+    (int nonempty-type-eq-decl nil integers nil)
+    (bool nonempty-type-eq-decl nil booleans nil)
+    (>= const-decl "bool" reals nil)
+    (nat nonempty-type-eq-decl nil naturalnumbers nil)
+    (append def-decl "list[T]" list_props nil)
+    (length def-decl "nat" list_props nil)
+    (+ const-decl "[numfield, numfield -> numfield]" number_fields nil)
+    (numfield nonempty-type-eq-decl nil number_fields nil)
+    (= const-decl "[T, T -> boolean]" equalities nil)
+    (Storage nonempty-type-eq-decl nil gotoF nil)
+    (AND const-decl "[bool, bool -> bool]" booleans nil)
+    (PRED type-eq-decl nil defined_types nil)
+    (list type-decl nil list_adt nil))
+   shostak))
  (expand_check 0
-  (expand_check-1 nil 3757485344
-   ("" (induct i) (("1" (postpone) nil nil) ("2" (postpone) nil nil))
+  (expand_check-1 nil 3757492819
+   ("" (induct i)
+    (("1" (induct storage)
+      (("1" (flatten)
+        (("1" (expand "expandStorage") (("1" (grind) nil nil)) nil))
+        nil)
+       ("2" (grind) nil nil))
+      nil)
+     ("2" (induct j)
+      (("1" (flatten)
+        (("1" (skolem!)
+          (("1" (inst - "null")
+            (("1" (grind)
+              (("1" (lemma append_length)
+                (("1" (inst - "storage!1" "cons(0, null)")
+                  (("1" (replace -1 :dir rl) (("1" (grind) nil nil))
+                    nil))
+                  nil))
+                nil)
+               ("2" (hide 1)
+                (("2" (lemma append_length)
+                  (("2" (inst - "storage!1" "cons(0, null)")
+                    (("2" (replace -1 :dir rl) (("2" (grind) nil nil))
+                      nil))
+                    nil))
+                  nil))
+                nil))
+              nil))
+            nil))
+          nil))
+        nil)
+       ("2" (skolem!)
+        (("2" (flatten)
+          (("2" (skolem!)
+            (("2" (flatten)
+              (("2" (grind)
+                (("1" (lemma append_length)
+                  (("1"
+                    (inst - "storage!1"
+                     "cons(0, nthList(1 - length(storage!1) + j!1))")
+                    (("1" (replace -1 :dir rl)
+                      (("1" (assert) (("1" (postpone) nil nil)) nil))
+                      nil))
+                    nil))
+                  nil)
+                 ("2" (postpone) nil nil))
+                nil))
+              nil))
+            nil))
+          nil))
+        nil))
+      nil))
     nil)
    nil shostak))
  (getStorage_TCC1 0
-  (getStorage_TCC1-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil
+  (getStorage_TCC1-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil
    nil))
  (getStorage_TCC2 0
-  (getStorage_TCC2-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil
+  (getStorage_TCC2-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil
    nil))
+ (get_check_TCC1 0
+  (get_check_TCC1-1 nil 3757497527 ("" (subtype-tcc) nil nil) nil nil))
+ (get_check 0
+  (get_check-1 nil 3757497529
+   ("" (expand "getStorage")
+    (("" (expand "nth") (("" (propax) nil nil)) nil)) nil)
+   ((nth def-decl "T" list_props nil)
+    (getStorage const-decl "[Storage, nat -> nat]" gotoF nil))
+   shostak))
  (setList_TCC1 0
-  (setList_TCC1-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil nil))
+  (setList_TCC1-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil nil))
  (setList_TCC2 0
-  (setList_TCC2-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil nil))
+  (setList_TCC2-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil nil))
  (setStorage_TCC1 0
-  (setStorage_TCC1-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil
+  (setStorage_TCC1-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil
    nil))
  (setStorage_TCC2 0
-  (setStorage_TCC2-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil
+  (setStorage_TCC2-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil
    nil))
+ (setStorage_test 0
+  (setStorage_test-1 nil 3757497690
+   ("" (expand "setStorage")
+    (("" (expand "setList") (("" (propax) nil nil)) nil)) nil)
+   ((setList def-decl "list[nat]" gotoF nil)
+    (setStorage const-decl "[Storage, int, int -> Storage]" gotoF nil))
+   shostak))
  (execute_TCC1 0
-  (execute_TCC1-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil nil))
+  (execute_TCC1-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil nil))
  (execute_TCC2 0
-  (execute_TCC2-1 nil 3757142689 ("" (termination-tcc) nil nil) nil
+  (execute_TCC2-1 nil 3757492677 ("" (termination-tcc) nil nil) nil
    nil))
  (execute_TCC3 0
-  (execute_TCC3-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil nil))
+  (execute_TCC3-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil nil))
  (inc_gp_TCC1 0
-  (inc_gp_TCC1-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil nil))
+  (inc_gp_TCC1-1 nil 3757492677 ("" (subtype-tcc) nil nil) nil nil))
  (inc_test_TCC1 0
-  (inc_test_TCC1-1 nil 3757142689 ("" (subtype-tcc) nil nil) nil nil))
+  (inc_test_TCC1-1 nil 3757498097 ("" (subtype-tcc) nil nil) nil nil))
  (inc_test 0
-  (inc_test-1 nil 3757142697
+  (inc_test-1 nil 3757498099
    ("" (expand "inc_gp")
     (("" (expand "execute")
-      (("" (expand "execute")
-        (("" (expand "nth")
-          (("" (expand "execute")
-            (("" (expand "nth")
-              (("" (expand "empty_storage")
-                (("" (expand "list2finseq")
+      (("" (expand "nth")
+        (("" (expand "inc")
+          (("" (expand "empty_storage")
+            (("" (expand "length")
+              (("" (expand "stop?")
+                (("" (expand "execute")
                   (("" (expand "nth")
-                    (("" (expand "inc")
-                      (("" (assert) (("" (postpone) nil nil)) nil))
+                    (("" (expand "nth")
+                      (("" (expand "stop")
+                        (("" (expand "id")
+                          (("" (expand "stop?")
+                            (("" (expand "expandStorage")
+                              ((""
+                                (expand "length")
+                                ((""
+                                  (expand "nthList")
+                                  ((""
+                                    (expand "nthList")
+                                    ((""
+                                      (expand "nthList")
+                                      ((""
+                                        (expand "append")
+                                        ((""
+                                          (expand "getStorage")
+                                          ((""
+                                            (expand "nth")
+                                            ((""
+                                              (expand "nth")
+                                              ((""
+                                                (expand "setStorage")
+                                                ((""
+                                                  (expand "setList")
+                                                  ((""
+                                                    (expand "setList")
+                                                    ((""
+                                                      (propax)
+                                                      nil
+                                                      nil))
+                                                    nil))
+                                                  nil))
+                                                nil))
+                                              nil))
+                                            nil))
+                                          nil))
+                                        nil))
+                                      nil))
+                                    nil))
+                                  nil))
+                                nil))
+                              nil))
+                            nil))
+                          nil))
+                        nil))
                       nil))
                     nil))
                   nil))
@@ -110,5 +297,20 @@
         nil))
       nil))
     nil)
-   nil shostak)))
+   ((execute def-decl "Storage" gotoF nil)
+    (inc const-decl "[nat -> Transition]" gotoF nil)
+    (length def-decl "nat" list_props nil)
+    (id const-decl "(bijective?[T, T])" identity nil)
+    (expandStorage const-decl "[Storage, nat -> Storage]" gotoF nil)
+    (nthList def-decl "list[nat]" gotoF nil)
+    (getStorage const-decl "[Storage, nat -> nat]" gotoF nil)
+    (setList def-decl "list[nat]" gotoF nil)
+    (setStorage const-decl "[Storage, int, int -> Storage]" gotoF nil)
+    (append def-decl "list[T]" list_props nil)
+    (stop const-decl "Transition" gotoF nil)
+    (stop? const-decl "bool" gotoF nil)
+    (empty_storage const-decl "Storage" gotoF nil)
+    (nth def-decl "T" list_props nil)
+    (inc_gp const-decl "Gp" gotoF nil))
+   shostak)))
 

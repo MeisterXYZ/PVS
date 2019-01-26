@@ -22,29 +22,36 @@ nthList(i:nat): RECURSIVE list[nat] =
 
 %Proofed
 nthList_length: FORMULA
-   (forall(i:nat): nthList(i)`length=i)
+   (forall(i:nat): length(nthList(i))=i)
 
 
 %%expandiert den Storage
-expandStorage:[Storage, nat -> Storage] = LAMBDA (s:Storage, (adress:nat | adress > length(s))):
- append(s,nthList(adress - length(s)))
+expandStorage:[Storage, nat -> Storage] = LAMBDA (s:Storage, (adress:nat | adress >= length(s))):
+ append(s,nthList(adress - length(s) + 1))
 
-%
-storage:Storage
+%proofed
+append_id: FORMULA
+ FORALL(s:Storage): append(s,null) = s
+
+%proofed
+append_length : FORMULA
+ FORALL (s1:Storage, s2:Storage): length(s1) + length(s2) = length(append(s1,s2))
+
+%pending
+storage:VAR Storage
 expand_check: FORMULA
- FORALL(i:nat): (length(storage) <= i IMPLIES length(expandStorage(storage,i)) = i )
+ FORALL(i:nat): (length(storage) < i IMPLIES length(expandStorage(storage,i)) = i )
 
-
-expandStorageCheck: FORMULA
- expandStorage(cons(1, null),5)= cons(1,cons(0,cons(0,cons(0,cons(0,null)))))
 
 
 %------------------getStorage
 %%returns Sotrage-List-item (register content) of item(register) i
 getStorage: [Storage,nat -> nat] = LAMBDA (s:Storage, (adress:nat | adress <= length(s))):
- s`seq(adress)
+	     nth(s,adress)
 
-%% TODO: check if this works by using some FORMULAS
+%
+get_check: FORMULA
+  getStorage(cons(3, null),0)=3
 
 
 %------------------setStorage
@@ -64,8 +71,11 @@ setList(list:Storage, pos:nat, value:nat): RECURSIVE list[nat] =
 
 setStorage: [Storage, int, int -> Storage] =
  LAMBDA (s:Storage, (adress :int | adress <= length(s)), (value:int | value >= 0)):
-  LET list = finseq2list(s) IN
-   list2finseq(setList(list, adress, value))
+   setList(s, adress, value)
+
+%
+setStorage_test: FORMULA
+  setStorage(cons(0,null),0,42) = cons(42,null)
 
 
 
@@ -78,7 +88,7 @@ Transition: TYPE = [Configuration -> Configuration]
 inc: [nat -> Transition]= LAMBDA (r:nat) :
  LAMBDA (cf:Configuration):
  LET s = cf`storage IN
-  IF s`length < r THEN
+  IF length(s) <= r THEN
    LET es = expandStorage(s,r) IN
     LET x = getStorage(es,r) IN
      LET ns = setStorage(es,r,x+1) IN
@@ -141,7 +151,7 @@ execute(gp:Gp): RECURSIVE Storage =
 %%%%%%%%%%%------------------------------------------------------PROOFS------------%%%%%%%%
 
 inc_test : FORMULA
- execute(inc_gp)`seq(1) = 1
+ nth(execute(inc_gp),1) = 1
 
 
 
