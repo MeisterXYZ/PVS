@@ -5,8 +5,8 @@ BEGIN
 Counter: TYPE+ = [int] CONTAINING 0
 
 %---------------------------------------Storage-------
-Storage: Type = finite_sequence[nat]
-empty_storage:Storage = list2finseq(null)
+Storage: Type+ = list[nat] CONTAINING null
+empty_storage:Storage = null
 
 %------------------expand Storage
 %%expands the Storage to the required size of i items(registers)
@@ -20,13 +20,24 @@ nthList(i:nat): RECURSIVE list[nat] =
   ENDIF
  MEASURE i
 
+%Proofed
+nthList_length: FORMULA
+   (forall(i:nat): nthList(i)`length=i)
+
 
 %%expandiert den Storage
 expandStorage:[Storage, nat -> Storage] = LAMBDA (s:Storage, (adress:nat | adress > length(s))):
- o(s,list2finseq(nthList(adress - length(s))))
+ append(s,nthList(adress - length(s)))
+
+%
+storage:Storage
+expand_check: FORMULA
+ FORALL(i:nat): (length(storage) <= i IMPLIES length(expandStorage(storage,i)) = i )
 
 
-%% TODO: check if this works by using some FORMULAS
+expandStorageCheck: FORMULA
+ expandStorage(cons(1, null),5)= cons(1,cons(0,cons(0,cons(0,cons(0,null)))))
+
 
 %------------------getStorage
 %%returns Sotrage-List-item (register content) of item(register) i
@@ -51,16 +62,11 @@ setList(list:Storage, pos:nat, value:nat): RECURSIVE list[nat] =
  MEASURE pos
 
 
-
-%% a Storage s, r is the adress
 setStorage: [Storage, int, int -> Storage] =
  LAMBDA (s:Storage, (adress :int | adress <= length(s)), (value:int | value >= 0)):
   LET list = finseq2list(s) IN
    list2finseq(setList(list, adress, value))
 
-
-
-%% TODO: check if this works by using some FORMULAS
 
 
 %-----------------------------------------Command-set-------
@@ -93,6 +99,7 @@ inc: [nat -> Transition]= LAMBDA (r:nat) :
 
 stop: Transition = id[Configuration]
 
+
 %-------------------Set of the commands
 Command: TYPE+ = {x : Transition| true} CONTAINING stop
 %-------------------List of Commands = Code of every Goto-Program
@@ -106,16 +113,21 @@ Gp: TYPE = [# config:Configuration , cmds:Commands #]
 % LET cmd = nth(gp`cmds, gp`config`counter) IN
 %  cmd(gp`config)
 
-%terminates()
+stop? (before:Configuration, after:Configuration): bool =
+ IF before = after THEN
+  TRUE
+ ELSE
+  FALSE
+ ENDIF
 
 execute(gp:Gp): RECURSIVE Storage =
  LET cmd = nth(gp`cmds, gp`config`counter) IN
-  IF cmd = stop THEN
-   gp`config`storage
-  ELSE
-   LET tres = cmd(gp`config) IN
-    execute((#config := tres, cmds := gp`cmds #))
-  ENDIF
+  LET newConfig = cmd(gp`config) IN
+   IF stop?(gp`config, newConfig) THEN
+    gp`config`storage
+   ELSE
+    execute((#config := newConfig, cmds := gp`cmds #))
+   ENDIF
  MEASURE gp`config`counter
 
  inc_gp:Gp = (#
