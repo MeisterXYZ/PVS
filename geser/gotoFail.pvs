@@ -23,6 +23,9 @@ nthList(i:nat): RECURSIVE list[nat] =
 nthList_length: FORMULA
    (forall(i:nat): length(nthList(i))=i)
 
+nth_nthList:FORMULA
+ FORALL(n:nat): nth(nthList(n+1),n) = 0
+
 %%expandiert den Storage
 expandStorage:[Storage, nat -> Storage] = LAMBDA (s:Storage, adress:nat):
  IF length(s) > adress THEN
@@ -32,8 +35,12 @@ expandStorage:[Storage, nat -> Storage] = LAMBDA (s:Storage, adress:nat):
  ENDIF
 
 %proofed
-append_id: FORMULA
+append_id1: FORMULA
  FORALL(s:Storage): append(s,null) = s
+
+%proofed
+append_id2: FORMULA
+ FORALL(s:Storage): append(null,s) = s
 
 %proofed
 append_length : FORMULA
@@ -41,6 +48,11 @@ append_length : FORMULA
 
 expand_length: FORMULA
  FORALL(s:Storage, adress:nat): adress < length(expandStorage(s,adress))
+
+car_append1: FORMULA
+ FORALL(s1:Storage, s2:Storage):length(s1) > 0 IMPLIES car(append(s1,s2)) = car(s1)
+
+
 
 %pending
 storage:VAR Storage
@@ -54,8 +66,8 @@ getStorage: [Storage,nat -> nat] = LAMBDA (s:Storage, adress:nat):
   nth(expandStorage(s, adress), adress)
   
 %
-get_check: FORMULA
-  getStorage(cons(3, null),0)=3
+null_get: FORMULA
+  FORALL(n:nat):getStorage(null, n) = 0
 
 
 %------------------setStorage
@@ -142,6 +154,7 @@ step?(gp1, gp2): bool =
   running?(gp1) AND execute_step(gp1) = gp2
 
 % gp2 is reachable from gp, and gp1 follows gp2
+%currying
 ascends?(gp)(gp1, gp2): bool =
   preorder_closure[Gp](step?)(gp, gp2) AND step?(gp2, gp1)
 
@@ -166,13 +179,18 @@ execute(gp:Gp | well_founded?[Gp](ascends?(gp))): RECURSIVE Storage =
  MEASURE gp BY ascends?(gp)
 
 
-
 %%% ------- LEMMA -------- %%%
 
 inc_ne_stop: LEMMA
  FORALL(i:nat): inc(i) /= stop
 
 
+%%% ------- Storage-proofs -------- %%%
+
+set_get: FORMULA
+ FORALL(s:Storage, adress:nat):
+  nth(setStorage(s, adress, 1 + getStorage(s, adress)), adress)
+  = getStorage(s,adress) + 1
 
 
 %%% ------- INC ------- %%%
@@ -182,14 +200,9 @@ inc_s: FORMULA
   gp`config`counter >= 0 AND
   gp`config`counter < length[Command](gp`cmds) AND
   nth(gp`cmds,gp`config`counter) = inc(i) IMPLIES
-  nth(execute_step(gp)`config`storage,i) = nth(gp`config`storage,i) + 1
+  nth(execute_step(gp)`config`storage,i) = nth(expandStorage(gp`config`storage, i),i) + 1
 
- inc_gp:Gp = (#
-  config:= (#
-   counter := 0,
-   storage := empty_storage
-  #),
-  cmds := cons( inc(1), cons( stop , null)) #)
+
 
 %%% ------- DEC ------- %%%
 
@@ -199,7 +212,6 @@ dec_s: FORMULA
   gp`config`counter < length[Command](gp`cmds) AND
   nth(gp`cmds,gp`config`counter) = dec(i) IMPLIES
   nth(execute_step(gp)`config`storage,i) = max(nth(gp`config`storage,i) - 1, 0)
-
 
 
 %%% ------ ADD ------ %%%
