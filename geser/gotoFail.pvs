@@ -81,16 +81,14 @@ inc: [nat -> Transition]= LAMBDA (r:nat) :
  LAMBDA (cf:Configuration):
  LET s = cf`storage IN
    LET x = getStorage(s,r) IN
-    LET ns = setStorage(s,r, x+1) IN
-     (# storage := ns, counter := cf`counter+1 #)
+    (# storage := setStorage(s,r, x+1), counter := cf`counter+1 #)
 
 %---------------dec(x)
 dec: [nat -> Transition]= LAMBDA (r:nat) :
  LAMBDA (cf:Configuration):
  LET s = cf`storage IN
    LET x = getStorage(s,r) IN
-    LET ns = setStorage(s,r, max(x-1,0)) IN
-     (# storage := ns, counter := cf`counter+1 #)
+    (# storage := setStorage(s,r, max(x-1,0)), counter := cf`counter+1 #)
 
 %---------------goto(x)
 goto: [nat -> Transition]= LAMBDA (adress:nat):
@@ -102,9 +100,9 @@ gotoZ: [nat,nat -> Transition]= LAMBDA (reg:nat, adress:nat):
  LAMBDA(cf:Configuration):
   LET s = cf`storage IN
    IF getStorage(s,reg) = 0 THEN
-    (# storage := cf`storage, counter := adress #)
+    (# storage := s, counter := adress #)
    ELSE
-    (# storage:= cf`storage, counter := cf`counter+1#)
+    (# storage:= s, counter := cf`counter+1#)
    ENDIF
 
 %---------------stop()
@@ -175,6 +173,8 @@ inc_ne_stop: LEMMA
  FORALL(i:nat): inc(i) /= stop
 
 
+
+
 %%% ------- INC ------- %%%
 
 inc_s: FORMULA
@@ -184,9 +184,6 @@ inc_s: FORMULA
   nth(gp`cmds,gp`config`counter) = inc(i) IMPLIES
   nth(execute_step(gp)`config`storage,i) = nth(gp`config`storage,i) + 1
 
-
-
-
  inc_gp:Gp = (#
   config:= (#
    counter := 0,
@@ -194,40 +191,14 @@ inc_s: FORMULA
   #),
   cmds := cons( inc(1), cons( stop , null)) #)
 
-%proofed
-inc_test : FORMULA
- nth(execute(inc_gp),1) = 1
-
-%bringt wahrscheinlich so nichts
-inc_all: FORMULA
- FORALL(i:nat):nth( execute((#
-  config:= (#
-   counter := 0,
-   storage := empty_storage
-  #),
-  cmds := cons( inc(i), cons( stop , null)) #)),i) = 1
-
 %%% ------- DEC ------- %%%
 
- dec_gp1:Gp = (#
-  config:= (#
-   counter := 0,
-   storage := cons(0, cons(2, null))
-  #),
-  cmds := cons( dec(1), cons( stop , null)) #)
-
-dec_test1: FORMULA
- nth(execute(dec_gp1),1) = 1
-
- dec_gp2:Gp = (#
-  config:= (#
-   counter := 0,
-   storage := empty_storage
-  #),
-  cmds := cons( dec(1), cons( stop , null)) #)
-
-dec_test2: FORMULA
- nth(execute(dec_gp2), 1) = 0
+dec_s: FORMULA
+ FORALL(i:nat):
+  gp`config`counter >= 0 AND
+  gp`config`counter < length[Command](gp`cmds) AND
+  nth(gp`cmds,gp`config`counter) = dec(i) IMPLIES
+  nth(execute_step(gp)`config`storage,i) = max(nth(gp`config`storage,i) - 1, 0)
 
 
 
