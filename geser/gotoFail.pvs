@@ -191,6 +191,12 @@ inc_ne_stop: LEMMA
 dec_ne_stop: LEMMA
  FORALL(i:nat): dec(i) /= stop
 
+goto_ne_stop: LEMMA
+ FORALL(i:nat): goto(i) /= stop
+
+gotoZ_ne_stop: LEMMA
+ FORALL(i,j:nat): gotoZ(i,j) /= stop
+
 %Lemma der verzweiflung
 ldv:LEMMA
  FORALL(s:Storage, ad:nat, v:nat):
