@@ -188,6 +188,9 @@ execute(gp:Gp | well_founded?[Gp](ascends?(gp))): RECURSIVE Storage =
 inc_ne_stop: LEMMA
  FORALL(i:nat): inc(i) /= stop
 
+dec_ne_stop: LEMMA
+ FORALL(i:nat): dec(i) /= stop
+
 %Lemma der verzweiflung
 ldv:LEMMA
  FORALL(s:Storage, ad:nat, v:nat):
@@ -220,7 +223,7 @@ dec_s: FORMULA
   gp`config`counter >= 0 AND
   gp`config`counter < length[Command](gp`cmds) AND
   nth(gp`cmds,gp`config`counter) = dec(i) IMPLIES
-  nth(execute_step(gp)`config`storage,i) = max(nth(gp`config`storage,i) - 1, 0)
+  nth(execute_step(gp)`config`storage,i) = max(getStorage(gp`config`storage, i) - 1, 0)
 
 
 %%% ------ ADD ------ %%%
