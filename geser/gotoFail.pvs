@@ -59,7 +59,6 @@ storage:VAR Storage
 expand_check: FORMULA
  FORALL(i:nat): (length(storage) < i IMPLIES length(expandStorage(storage,i)) = i )
 
-
 %------------------getStorage
 %%returns Sotrage-List-item (register content) of item(register) i
 getStorage: [Storage,nat -> nat] = LAMBDA (s:Storage, adress:nat):
@@ -75,13 +74,18 @@ null_get: FORMULA
 %% Hilfsfunktion um die Liste zu bearbeiten indem eine neue mit modifizierten Werten erstellt und zurückgegeben wird
 
 setStorage(s:Storage, adress:nat, value:nat): RECURSIVE Storage =
- LET es = expandStorage(s, adress) in 
+LET es = expandStorage(s, adress) in 
   IF adress = 0 THEN
    cons(value,cdr(es))
   ELSE
-   cons(car(es),setStorage(cdr(es),adress - 1,value))
+  cons(car(es),setStorage(cdr(es),adress - 1,value))
   ENDIF
  MEASURE adress
+
+%unprooved
+nth_set_Storage:FORMULA
+ FORALL(s:Storage, ad:nat, v:nat):
+ nth(setStorage(s,ad,v),ad) = v
 
 %-----------------------------------------Command-set-------
 %--------------------command-type
@@ -184,6 +188,11 @@ execute(gp:Gp | well_founded?[Gp](ascends?(gp))): RECURSIVE Storage =
 inc_ne_stop: LEMMA
  FORALL(i:nat): inc(i) /= stop
 
+%Lemma der verzweiflung
+ldv:LEMMA
+ FORALL(s:Storage, ad:nat, v:nat):
+  nth(setStorage(s,ad,v),ad) = v
+
 
 %%% ------- Storage-proofs -------- %%%
 
@@ -200,7 +209,7 @@ inc_s: FORMULA
   gp`config`counter >= 0 AND
   gp`config`counter < length[Command](gp`cmds) AND
   nth(gp`cmds,gp`config`counter) = inc(i) IMPLIES
-  nth(execute_step(gp)`config`storage,i) = nth(expandStorage(gp`config`storage, i),i) + 1
+  nth(execute_step(gp)`config`storage,i) = getStorage(gp`config`storage, i) + 1
 
 
 
