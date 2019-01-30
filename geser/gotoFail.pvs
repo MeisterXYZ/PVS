@@ -226,6 +226,37 @@ dec_s: FORMULA
   nth(execute_step(gp)`config`storage,i) = max(getStorage(gp`config`storage, i) - 1, 0)
 
 
+%%% ------- GOTO ------- %%%
+
+goto_s: FORMULA
+ FORALL(i:nat):
+  gp`config`counter >= 0 AND
+  gp`config`counter < length[Command](gp`cmds) AND
+  i <= length[Command](gp`cmds) AND
+  nth(gp`cmds,gp`config`counter) = goto(i) IMPLIES
+  execute_step(gp)`config`counter = i
+
+
+%%% -------- GOTOZ ------- %%%
+
+gotoZ_s1: FORMULA
+ FORALL(i:nat, j:nat):
+  gp`config`counter >= 0 AND
+  gp`config`counter < length[Command](gp`cmds) AND
+  j <= length[Command](gp`cmds) AND
+  getStorage(gp`config`storage,i) = 0 AND
+  nth(gp`cmds,gp`config`counter) = gotoZ(i,j) IMPLIES
+  execute_step(gp)`config`counter = j
+
+gotoZ_s2: FORMULA
+ FORALL(i:nat, j:nat):
+  gp`config`counter >= 0 AND
+  gp`config`counter < length[Command](gp`cmds) AND
+  j <= length[Command](gp`cmds) AND
+  getStorage(gp`config`storage,i) /= 0 AND
+  nth(gp`cmds,gp`config`counter) = gotoZ(i,j) IMPLIES
+  execute_step(gp)`config`counter = gp`config`counter + 1 
+
 %%% ------ ADD ------ %%%
 
 %add_cmd:Commands = cons(gotoZ(1, 4), cons(inc(0), cons(dec(1), cons(goto(0), cons(gotoZ(2,8), cons(inc(0), cons(dec(2), cons(goto(4), cons (stop, null)))))))))
