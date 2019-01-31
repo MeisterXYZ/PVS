@@ -20,6 +20,11 @@ null_storage1: FORMULA
 storage_last:FORMULA
  FORALL(s:Storage,v:nat): s = cons(v,null) IMPLIES cdr(s) = null
 
+cdr_append_cons: LEMMA
+ FORALL(s:Storage,v:nat):
+ length(cdr(append(s, cons(v, null)))) = length(s)
+
+
 %------------------expand Storage
 %%expands the Storage to the required size of i items(registers)
 
@@ -110,20 +115,15 @@ LET es = expandStorage(s, adress) in
 setStorage_length: FORMULA
  FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = length(expandStorage(s,ad))
 
-%pending
-nth_set_Storage:FORMULA
- FORALL(s:Storage, ad:nat, v:nat):
- nth(setStorage(s,ad,v),ad) = v
-
-%Lemma der verzweiflung
-ldv:LEMMA
- FORALL(s:Storage, ad:nat, v:nat):
-  nth(setStorage(s,ad,v),ad) = v
-
-%daraus resultierend
-ldkv:LEMMA
+%proofed
+setStorage_adress_length:FORMULA
  FORALL(s:Storage, ad:nat, v:nat):
   ad < length(setStorage(s, ad, v))
+
+%proofed
+nth_setStorage:FORMULA
+ FORALL(s:Storage, ad:nat, v:nat):
+ nth(setStorage(s,ad,v),ad) = v
   
 %-----------------------------------------Command-set-------
 %--------------------command-type
