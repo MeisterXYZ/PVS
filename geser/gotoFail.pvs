@@ -20,10 +20,6 @@ null_storage1: FORMULA
 storage_last:FORMULA
  FORALL(s:Storage,v:nat): s = cons(v,null) IMPLIES cdr(s) = null
 
-%pending
-eq_storage_length:FORMULA
- FORALL(s:Storage,v:nat): length(s) > 0 IMPLIES length(cons(v, cdr(s))) = length(s)
-
 %------------------expand Storage
 %%expands the Storage to the required size of i items(registers)
 
@@ -35,7 +31,7 @@ nthList(i:nat): RECURSIVE list[nat] =
   ENDIF
  MEASURE i
 
-%Proofed
+%proofed
 nthList_length: FORMULA
    (forall(i:nat): length(nthList(i))=i)
 
@@ -84,8 +80,8 @@ car_append1: FORMULA
  FORALL(s1:Storage, s2:Storage):length(s1) > 0 IMPLIES car(append(s1,s2)) = car(s1)
 
 %pending
-expand_check: FORMULA
- FORALL(s:Storage, i:nat): (length(s) < i IMPLIES length(expandStorage(s,i)) = i+1 )
+expand_adress_length: FORMULA
+ FORALL(s:Storage, ad:nat): ad < length(expandStorage(s,ad))
 
 %------------------getStorage
 %%returns Sotrage-List-item (register content) of item(register) i
@@ -110,18 +106,11 @@ LET es = expandStorage(s, adress) in
   ENDIF
  MEASURE adress
 
-setStorage_change_length: FORMULA
- FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = max(length(s),ad+1)
-
-
 %pending
 setStorage_length: FORMULA
  FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = length(expandStorage(s,ad))
 
-ldkv:LEMMA
- FORALL(s:Storage, ad:nat, v:nat): ad < length(setStorage(s,ad,v))
-
-%unprooved
+%pending
 nth_set_Storage:FORMULA
  FORALL(s:Storage, ad:nat, v:nat):
  nth(setStorage(s,ad,v),ad) = v
@@ -131,6 +120,11 @@ ldv:LEMMA
  FORALL(s:Storage, ad:nat, v:nat):
   nth(setStorage(s,ad,v),ad) = v
 
+%daraus resultierend
+ldkv:LEMMA
+ FORALL(s:Storage, ad:nat, v:nat):
+  ad < length(setStorage(s, ad, v))
+  
 %-----------------------------------------Command-set-------
 %--------------------command-type
 Configuration: TYPE = [# storage:Storage, counter:Counter #]
@@ -227,7 +221,7 @@ execute(gp:Gp | well_founded?[Gp](ascends?(gp))): RECURSIVE Storage =
  MEASURE gp BY ascends?(gp)
 
 
-%%% ------- LEMMA for inc-------- %%%
+%%% ------- LEMMA for stop-------- %%%
 
 inc_ne_stop: LEMMA
  FORALL(i:nat): inc(i) /= stop
