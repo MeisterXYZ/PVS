@@ -13,9 +13,16 @@ null_storage: FORMULA
  FORALL(s:Storage):
  length(s) > 0 IMPLIES s /= null
 
-kldv: LEMMA
- FORALL(s:Storage,v:nat): length(cons(v, cdr(s))) = length(s) IMPLIES s /= null
+null_storage1: FORMULA
+ FORALL(s:Storage): s = null IFF length(s) = 0
 
+% proofed but need to be IFF -> cant proof
+storage_last:FORMULA
+ FORALL(s:Storage,v:nat): s = cons(v,null) IMPLIES cdr(s) = null
+
+%pending
+eq_storage_length:FORMULA
+ FORALL(s:Storage,v:nat): length(s) > 0 IMPLIES length(cons(v, cdr(s))) = length(s)
 
 %------------------expand Storage
 %%expands the Storage to the required size of i items(registers)
@@ -32,6 +39,7 @@ nthList(i:nat): RECURSIVE list[nat] =
 nthList_length: FORMULA
    (forall(i:nat): length(nthList(i))=i)
 
+%proofed
 nth_nthList:FORMULA
  FORALL(n:nat): nth(nthList(n+1),n) = 0
 
@@ -55,25 +63,36 @@ append_id2: FORMULA
 append_length : FORMULA
  FORALL (s1:Storage, s2:Storage): length(s1) + length(s2) = length(append(s1,s2))
 
+%proofed
 expand_length: FORMULA
  FORALL(s:Storage, adress:nat): adress < length(expandStorage(s,adress))
 
+%proofed
+expand_length_sub1: FORMULA
+ FORALL(s:Storage, ad:nat): length(s) > ad IMPLIES length(expandStorage(s,ad)) = length(s)
+
+%proofed
+expand_length_sub2: FORMULA
+ FORALL(s:Storage, ad:nat): length(s) <= ad IMPLIES length(expandStorage(s,ad)) = ad + 1
+
+%proofed
+expand_eq_length: FORMULA
+ FORALL(s:Storage, ad:nat): length(expandStorage(s,ad)) = max(length(s),ad+1)
+
+%proofed
 car_append1: FORMULA
  FORALL(s1:Storage, s2:Storage):length(s1) > 0 IMPLIES car(append(s1,s2)) = car(s1)
 
-
-
 %pending
-storage:VAR Storage
 expand_check: FORMULA
- FORALL(i:nat): (length(storage) < i IMPLIES length(expandStorage(storage,i)) = i )
+ FORALL(s:Storage, i:nat): (length(s) < i IMPLIES length(expandStorage(s,i)) = i+1 )
 
 %------------------getStorage
 %%returns Sotrage-List-item (register content) of item(register) i
 getStorage: [Storage,nat -> nat] = LAMBDA (s:Storage, adress:nat):
   nth(expandStorage(s, adress), adress)
   
-%
+%proofed
 null_get: FORMULA
   FORALL(n:nat):getStorage(null, n) = 0
 
@@ -94,13 +113,23 @@ LET es = expandStorage(s, adress) in
 setStorage_change_length: FORMULA
  FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = max(length(s),ad+1)
 
+
+%pending
 setStorage_length: FORMULA
+ FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = length(expandStorage(s,ad))
+
+ldkv:LEMMA
  FORALL(s:Storage, ad:nat, v:nat): ad < length(setStorage(s,ad,v))
 
 %unprooved
 nth_set_Storage:FORMULA
  FORALL(s:Storage, ad:nat, v:nat):
  nth(setStorage(s,ad,v),ad) = v
+
+%Lemma der verzweiflung
+ldv:LEMMA
+ FORALL(s:Storage, ad:nat, v:nat):
+  nth(setStorage(s,ad,v),ad) = v
 
 %-----------------------------------------Command-set-------
 %--------------------command-type
@@ -198,7 +227,7 @@ execute(gp:Gp | well_founded?[Gp](ascends?(gp))): RECURSIVE Storage =
  MEASURE gp BY ascends?(gp)
 
 
-%%% ------- LEMMA -------- %%%
+%%% ------- LEMMA for inc-------- %%%
 
 inc_ne_stop: LEMMA
  FORALL(i:nat): inc(i) /= stop
@@ -211,11 +240,6 @@ goto_ne_stop: LEMMA
 
 gotoZ_ne_stop: LEMMA
  FORALL(i,j:nat): gotoZ(i,j) /= stop
-
-%Lemma der verzweiflung
-ldv:LEMMA
- FORALL(s:Storage, ad:nat, v:nat):
-  nth(setStorage(s,ad,v),ad) = v
 
 
 %%% ------- Storage-proofs -------- %%%
