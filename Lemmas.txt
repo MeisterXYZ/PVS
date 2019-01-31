@@ -1,0 +1,167 @@
+
+
+%%Jetziges kleinstes Lemma: Adresse sind immer kleiner als Länge des Speichers oder Adresse +1 wenn SetStorage aufgerufen wurde
+
+lenSetStoMax: LEMMA
+forall (s:Storage):
+forall (ad,v:nat):
+length[nat](setStorage(s, ad, v)) = max(length[nat](s),ad+1)
+
+
+
+%%------setStoLen - Ehemals: Lemma der noch kleineren Verzweiflung ---%%
+
+                                                 
+setStoLen: FORMULA
+  forall(ad,v:nat,s:Storage):
+  ad < length[nat](setStorage(s, ad, v))
+
+
+  %%Beweis:
+ (skolem!)
+ (lemma lenSetStoMax)
+ (inst - "s!1" "ad!1" "v!1")
+ (grind))
+
+
+
+%%------nth_set_Storage - Ehemals: Lemma der kleinen Verzweiflung ---%%
+
+nth_set_Storage:FORMULA
+ FORALL(s:Storage, ad:nat, v:nat):
+ nth(setStorage(s,ad,v),ad) = v
+
+  %%Beweis:
+   (induct ad)
+ (("1"
+   (skolem!)
+   (expand "setStorage")
+   (expand "expandStorage")
+   (grind))
+  ("2"
+   (skosimp)
+   (skolem!)
+   (expand setStorage +)
+   (expand nth +)
+   (inst - "cdr(expandStorage(s!1, 1 + j!1))" "v!1"))
+  ("3"
+   (hide 2)
+   (skolem!)
+   (lemma setStoLen)
+   (inst - "ad!2" "v!1" "s!1"))))
+
+
+
+%%% ------- INC ------- %%%                                                                                                                                                                                 
+
+inc_s: FORMULA
+ FORALL(i:nat):
+  gp`config`counter >= 0 AND
+  gp`config`counter < length[Command](gp`cmds) AND
+  nth(gp`cmds,gp`config`counter) = inc(i) IMPLIES
+  nth(execute_step(gp)`config`storage,i) = getStorage(gp`config`storage, i) + 1
+
+
+
+	%%Beweis
+	induct i)
+	 (("1"
+	   (skosimp)
+	   (expand "execute_step")
+	   (rewrite -3)
+	   (expand "inc")
+	   (grind))
+	  ("2"
+	   (skosimp)
+	   (skosimp)
+	   (expand "execute_step")
+	   (rewrite -4)
+	   (hide -1)
+	   (expand inc +)
+	   (rewrite nth_set_Storage))
+	  ("3"
+	   (skosimp)
+	   (skosimp)
+	   (expand "execute_step")
+	   (rewrite -6)
+	   (rewrite -3)
+	   (expand inc +)
+	   (rewrite nth_set_Storage))
+	  ("4"
+	   (skosimp)
+	   (skosimp)
+	   (expand "execute_step")
+	   (rewrite -6)
+	   (expand inc +)
+	   (rewrite nth_set_Storage))))
+
+
+
+
+
+
+
+
+
+Überlegungen zu den Lemmas:
+
+
+Warum gilt setStoLen? (Abgeschlossen)
+ad!1 < length[nat](setStorage(s!1, ad!1, v!1))
+
+	Idee:
+
+	Wenn ad!1 < length(s!1)
+
+		Dann wahr weil:
+		ad!1 < length[nat](s!1)
+
+		da
+		length[nat](setStorage(s!1, ad!1, v!1)) = max(length[nat](s!1),a!1+1)
+
+
+	Wenn ad!1 > length(s!1)
+
+		Dann wahr weil:
+		ad!1 < a!1+1
+
+		length[nat](setStorage(s!1, ad!1, v!1)) = max(length[nat](s!1),a!1+1)
+
+
+
+
+Warum gilt lenSetStoMax? (OFFEN)
+
+length[nat](setStorage(s!1, ad!1, v!1)) = max(length[nat](s!1),a!1+1)
+
+
+	Es wird immer expandStorage aufgerufen.
+
+	Fall 1:
+	Es war notwendig, da im Aufruf expandStorage(s, adress) galt: length(s) <= adress
+		
+		Dann gilt length(expandStorage(s, adress)) = adress + 1
+
+	Fall 2:
+	Es war nich notwendig. Der Speicher hatte bereit die passende Länge lenght(s) > adress
+		
+		Dann gilt 
+		length(expandStorage(s, adress)) = lenght(s)
+
+
+
+	Wie Aufschreiben? 
+	Erstmal als Lemmata:
+
+	esl1: LEMMA
+	FORALL (s:Storage, ad:nat):
+	length(s) <= ad IMPLIES length(expandStorage(s, ad)) = ad + 1
+
+	esl2: LEMMA
+	FORALL (s:Storage, ad:nat):
+	lenght(s) > ad IMPLIES length(expandStorage(s, adress)) = adress + 1
+
+	--> So noch nicht nutzbar. Warum?
+	--> Wie bekommt man MAX übersetzt?
+
+
