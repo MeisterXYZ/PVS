@@ -8,6 +8,15 @@ Counter: TYPE+ = [int] CONTAINING 0
 Storage: Type+ = list[nat] CONTAINING null
 empty_storage:Storage = null
 
+
+null_storage: FORMULA
+ FORALL(s:Storage):
+ length(s) > 0 IMPLIES s /= null
+
+kldv: LEMMA
+ FORALL(s:Storage,v:nat): length(cons(v, cdr(s))) = length(s) IMPLIES s /= null
+
+
 %------------------expand Storage
 %%expands the Storage to the required size of i items(registers)
 
@@ -81,6 +90,12 @@ LET es = expandStorage(s, adress) in
   cons(car(es),setStorage(cdr(es),adress - 1,value))
   ENDIF
  MEASURE adress
+
+setStorage_change_length: FORMULA
+ FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = max(length(s),ad+1)
+
+setStorage_length: FORMULA
+ FORALL(s:Storage, ad:nat, v:nat): ad < length(setStorage(s,ad,v))
 
 %unprooved
 nth_set_Storage:FORMULA
