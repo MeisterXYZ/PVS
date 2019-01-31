@@ -1,14 +1,22 @@
-gotoF: THEORY
+gotoFail: THEORY
 BEGIN
 
-%---------------------------------------counter-------
+%---------------------------------------MODELLING OF THE GOTO-PROGRAMS --------------------------
+
+
+%---------------------------------------program-counter-------
 Counter: TYPE+ = [int] CONTAINING 0
 
 %---------------------------------------Storage-------
+% contianing n:nat Registers
+% a register can store a value v:nat
+% used model list[nat] 
 Storage: Type+ = list[nat] CONTAINING null
+
+% constant for an empty storage is required later 
 empty_storage:Storage = null
 
-
+% ------------------FORMULAS for Storage
 null_storage: FORMULA
  FORALL(s:Storage):
  length(s) > 0 IMPLIES s /= null
@@ -20,14 +28,11 @@ null_storage1: FORMULA
 storage_last:FORMULA
  FORALL(s:Storage,v:nat): s = cons(v,null) IMPLIES cdr(s) = null
 
-cdr_append_cons: LEMMA
- FORALL(s:Storage,v:nat):
- length(cdr(append(s, cons(v, null)))) = length(s)
-
-
+%---------------------------------------Storage-Functions-------  
 %------------------expand Storage
 %%expands the Storage to the required size of i items(registers)
 
+% ----------helper-function for getting a list of length i with all values v=0
 nthList(i:nat): RECURSIVE list[nat] =
   IF i = 0 THEN
    null
@@ -35,6 +40,8 @@ nthList(i:nat): RECURSIVE list[nat] =
    cons(0,nthList(i - 1))
   ENDIF
  MEASURE i
+
+% ------FORMULAS for helper-function nthList
 
 %proofed
 nthList_length: FORMULA
@@ -44,7 +51,8 @@ nthList_length: FORMULA
 nth_nthList:FORMULA
  FORALL(n:nat): nth(nthList(n+1),n) = 0
 
-%%expandiert den Storage
+
+% ---------actual expand Storage-Function
 expandStorage:[Storage, nat -> Storage] = LAMBDA (s:Storage, adress:nat):
  IF length(s) > adress THEN
   s
@@ -52,6 +60,7 @@ expandStorage:[Storage, nat -> Storage] = LAMBDA (s:Storage, adress:nat):
   append(s,nthList((adress + 1) - length(s)))
  ENDIF
 
+% ------FORMULAS for actual expand Storage-Function
 %proofed
 append_id1: FORMULA
  FORALL(s:Storage): append(s,null) = s
@@ -88,20 +97,20 @@ car_append1: FORMULA
 expand_adress_length: FORMULA
  FORALL(s:Storage, ad:nat): ad < length(expandStorage(s,ad))
 
-%------------------getStorage
+%------------------getStorage        
 %%returns Sotrage-List-item (register content) of item(register) i
 getStorage: [Storage,nat -> nat] = LAMBDA (s:Storage, adress:nat):
   nth(expandStorage(s, adress), adress)
   
+
+% ------FORMULAS for getStorage function
 %proofed
 null_get: FORMULA
   FORALL(n:nat):getStorage(null, n) = 0
 
 
 %------------------setStorage
-
-%% Hilfsfunktion um die Liste zu bearbeiten indem eine neue mit modifizierten Werten erstellt und zurückgegeben wird
-
+%% value:nat is set to register with adress:nat by re-create the storage via cons() recursivly 
 setStorage(s:Storage, adress:nat, value:nat): RECURSIVE Storage =
 LET es = expandStorage(s, adress) in 
   IF adress = 0 THEN
@@ -111,8 +120,15 @@ LET es = expandStorage(s, adress) in
   ENDIF
  MEASURE adress
 
+
+% ------FORMULAS for setStorage function
+
 %pending
-setStorage_length: FORMULA
+%setStorage_length: FORMULA
+% FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = length(expandStorage(s,ad))
+
+%pending                                                                                   
+setStorage_lengthl: LEMMA
  FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = length(expandStorage(s,ad))
 
 %proofed
@@ -125,11 +141,17 @@ nth_setStorage:FORMULA
  FORALL(s:Storage, ad:nat, v:nat):
  nth(setStorage(s,ad,v),ad) = v
   
+
+   
 %-----------------------------------------Command-set-------
-%--------------------command-type
+%-------------------command-type
+% configuration contains counter and storage. This isolates the dynamic storage and counter from the static command-list of the Goto Program 
 Configuration: TYPE = [# storage:Storage, counter:Counter #]
+% whenever a command is executed it only changes the Configuration of the Goto program. The type of the commands is therefor:
 Transition: TYPE = [Configuration -> Configuration]
 
+
+%-------------------actual commands
 %---------------inc(x)
 inc: [nat -> Transition]= LAMBDA (r:nat) :
  LAMBDA (cf:Configuration):
@@ -165,41 +187,42 @@ stop: Transition = id[Configuration]
 
 %-------------------Set of the commands
 Command: TYPE+ = {x : Transition| true} CONTAINING stop
-
 Commands: TYPE = list[Command]
 
-%------------------------------------------GOTO-Program------
+
+
+%------------------------------------------ GOTO-Program------
+% combines the Configuration (which contains storage and counter) with the Commands of the program
 Gp: TYPE = [# config:Configuration , cmds:Commands #]
 
-%----------------------- rocket sience -------------------------
 
+
+
+%---------------------------------------executing the goto-program-------
 IMPORTING orders@closure_ops
 
-computation_step(t: Transition)(cf1, cf2: Configuration): bool =
-  t /= stop AND cf2 = t(cf1)
-
-% A goto program is running if the counter is legal and points to a
-% command other than "stop"
+% A goto program is running if the counter is legal and points to a command other than "stop"
 running?(gp: Gp): bool =
   gp`config`counter >= 0 AND
   gp`config`counter < length(gp`cmds) AND
   nth(gp`cmds, gp`config`counter) /= stop
 
-% execute the next command, provided that it is not the stop command
+% execute the next command. By using running predicate it is provided that the command is not the stop command
 execute_step(gp: (running?)): Gp =
   (#config := nth(gp`cmds, gp`config`counter)(gp`config), cmds := gp`cmds #)
 
+% required variables for declarations below
 gp, gp1, gp2: VAR Gp
 
 % step? yields the global computation relation of the goto program gp
 step?(gp1, gp2): bool =
   running?(gp1) AND execute_step(gp1) = gp2
 
-% gp2 is reachable from gp, and gp1 follows gp2
-%currying
+% gp2 is reachable from gp, and gp1 follows gp2. This uses currying. Required in the execute funcion for ensuring a well founded chain of execution-steps
 ascends?(gp)(gp1, gp2): bool =
   preorder_closure[Gp](step?)(gp, gp2) AND step?(gp2, gp1)
 
+% ------FORMULAS for running and ascends 
 ascends_propagates: FORMULA
   running?(gp) AND ascends?(execute_step(gp))(gp1, gp2) IMPLIES
   ascends?(gp)(gp1, gp2)
@@ -211,6 +234,8 @@ well_founded_propagates: FORMULA
   running?(gp) AND well_founded?(ascends?(gp)) IMPLIES
   well_founded?(ascends?(execute_step(gp)))
 
+
+% ------ actual execution function. MEASURE gp BY ascends?(gp) in combination with gp:Gp | well_founded?[Gp](ascends?(gp)) ensuring the well founded chain of execution-steps
 execute(gp:Gp | well_founded?[Gp](ascends?(gp))): RECURSIVE Storage =
  IF running?(gp) THEN
   execute((# config := nth(gp`cmds, gp`config`counter)(gp`config),
@@ -221,7 +246,8 @@ execute(gp:Gp | well_founded?[Gp](ascends?(gp))): RECURSIVE Storage =
  MEASURE gp BY ascends?(gp)
 
 
-%%% ------- LEMMA for stop-------- %%%
+%%% ---- LEMMATA for stop
+% required for the proofs of actual goto-programs 
 
 inc_ne_stop: LEMMA
  FORALL(i:nat): inc(i) /= stop
@@ -236,13 +262,13 @@ gotoZ_ne_stop: LEMMA
  FORALL(i,j:nat): gotoZ(i,j) /= stop
 
 
-%%% ------- Storage-proofs -------- %%%
 
-set_get: FORMULA
- FORALL(s:Storage, adress:nat):
-  nth(setStorage(s, adress, 1 + getStorage(s, adress)), adress)
-  = getStorage(s,adress) + 1
 
+
+
+%----------------------------------------------------- PROOFS  --------------------------  
+
+% -------------------- PROOFS for single commands -----------------
 
 %%% ------- INC ------- %%%
 
@@ -296,26 +322,7 @@ gotoZ_s2: FORMULA
   nth(gp`cmds,gp`config`counter) = gotoZ(i,j) IMPLIES
   execute_step(gp)`config`counter = gp`config`counter + 1 
 
-%%% ------ ADD ------ %%%
 
-%add_cmd:Commands = cons(gotoZ(1, 4), cons(inc(0), cons(dec(1), cons(goto(0), cons(gotoZ(2,8), cons(inc(0), cons(dec(2), cons(goto(4), cons (stop, null)))))))))
+% -------------------- PROOFS for programs with generic values (= proofing the semantic) -----------------
 
-add_cmd:Commands = cons(gotoZ(1,4), cons(inc(0), cons(dec(0), cons(goto(0), cons(stop, null)))))
-
-add_gp: Gp = (#
-  config:= (#
-   counter := 0,
-   storage := cons(0 ,cons(2,cons(3,null)))
-  #),
-  cmds := add_cmd#)
-
-
-add_gen:FORMULA
- FORALL(i:nat,j:nat):nth( execute((#
-  config:= (#
-   counter := 0,
-   storage := cons(i ,cons(j,null))
-  #),
-   cmds := add_cmd #)),0) = i + j
-
-End gotoF
+End gotoFail
