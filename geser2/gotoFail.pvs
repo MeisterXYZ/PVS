@@ -28,11 +28,6 @@ null_storage1: FORMULA
 storage_last:FORMULA
  FORALL(s:Storage,v:nat): s = cons(v,null) IMPLIES cdr(s) = null
 
-cdr_append_cons: LEMMA
- FORALL(s:Storage,v:nat):
- length(cdr(append(s, cons(v, null)))) = length(s)
-
-
 %---------------------------------------Storage-Functions-------  
 %------------------expand Storage
 %%expands the Storage to the required size of i items(registers)
@@ -126,7 +121,12 @@ LET es = expandStorage(s, adress) in
  MEASURE adress
 
 
-% ------FORMULAS for setStorage function  
+% ------FORMULAS for setStorage function
+
+ldv: LEMMA
+forall(s:Storage,ad:nat):
+ad >= length(s) IMPLIES length(expandStorage(s, ad)) = ad
+
 %pending
 setStorage_length: FORMULA
  FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = length(expandStorage(s,ad))
@@ -272,17 +272,6 @@ gotoZ_ne_stop: LEMMA
 
 %----------------------------------------------------- PROOFS  --------------------------  
 
-
-%%% ------- Storage-proofs -------- %%%
-% kann der raus?
-set_get: FORMULA
- FORALL(s:Storage, adress:nat):
-  nth(setStorage(s, adress, 1 + getStorage(s, adress)), adress)
-  = getStorage(s,adress) + 1
-
-
-
-
 % -------------------- PROOFS for single commands -----------------
 
 %%% ------- INC ------- %%%
@@ -338,33 +327,19 @@ gotoZ_s2: FORMULA
   execute_step(gp)`config`counter = gp`config`counter + 1 
 
 
+% -------------------- PROOFS for progrxams with generic values (= proofing the semantic) -----------------
 
+% ----Program: inc(0),inc(0),stop = i+2
+incinc: FORMULA
+   FORALL(i:nat):
+      nth( execute((#
+        config:= (#
+          counter := 0,
+          storage := cons(i,null)
+         #),
+        cmds := cons(inc(0),cons(inc(0),cons(stop,null))) #))
+        ,0) 
+      = i +2
 
-
-
-% -------------------- PROOFS for programs with specific values (=execution of a program) -----------------  
-
-add_cmd:Commands = cons(gotoZ(1,4), cons(inc(0), cons(dec(0), cons(goto(0), cons(stop, null)))))
-
-
-
-
-% -------------------- PROOFS for programs with generic values (= proofing the semantic) -----------------
-
-add_gp: Gp = (#
-  config:= (#
-   counter := 0,
-   storage := cons(0 ,cons(2,cons(3,null)))
-  #),
-  cmds := add_cmd#)
-
-
-add_gen:FORMULA
- FORALL(i:nat,j:nat):nth( execute((#
-  config:= (#
-   counter := 0,
-   storage := cons(i ,cons(j,null))
-  #),
-   cmds := add_cmd #)),0) = i + j
 
 End gotoFail
