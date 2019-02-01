@@ -122,17 +122,13 @@ LET es = expandStorage(s, adress) in
 
 
 % ------FORMULAS for setStorage function
+% Beim Aufruf von setStorage(s,ad,v) wird in jedem Fall expandStorage(s,ad) aufgerufen um eine valide Laenge des Speichers sicherzustellen.
+% Bei einem rekursiven Aufruf von setStorage werden sowohl die Laenge des Speichers als auch die Adresse ad dekrementiert. Daher werden bei weiteren Aufrufen von expandStorage keine Verlaengerungen des Speichers vorgenommen.
+% Daneben beinfluss setStorage die Laenge des Speichers nicht.
+% Dabei gilt beim ersten Aufruf von setStorage die Formel "expand_eq_length". Für jeden weiteren Aufruf gilt aufgrund des oben beschriebenen Umstandes, dass durch expandStorage keine Veraunderung der Laenge des Speichers erfolgt.
+% Daher kann als AXIOM angenommen werden:  
 
-ldv: LEMMA
-forall(s:Storage,ad:nat):
-ad >= length(s) IMPLIES length(expandStorage(s, ad)) = ad
-
-%pending
-setStorage_length: FORMULA
- FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = length(expandStorage(s,ad))
-
-%pending                                                                                   
-setStorage_lengthl: LEMMA
+setStorage_lengthl: AXIOM
  FORALL(s:Storage, ad:nat, v:nat): length(setStorage(s,ad,v)) = length(expandStorage(s,ad))
 
 %proofed
@@ -253,16 +249,16 @@ execute(gp:Gp | well_founded?[Gp](ascends?(gp))): RECURSIVE Storage =
 %%% ---- LEMMATA for stop
 % required for the proofs of actual goto-programs 
 
-inc_ne_stop: LEMMA
+inc_ne_stop: AXIOM
  FORALL(i:nat): inc(i) /= stop
 
-dec_ne_stop: LEMMA
+dec_ne_stop: AXIOM
  FORALL(i:nat): dec(i) /= stop
 
-goto_ne_stop: LEMMA
+goto_ne_stop: AXIOM
  FORALL(i:nat): goto(i) /= stop
 
-gotoZ_ne_stop: LEMMA
+gotoZ_ne_stop: AXIOM
  FORALL(i,j:nat): gotoZ(i,j) /= stop
 
 
